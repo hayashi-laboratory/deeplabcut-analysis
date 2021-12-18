@@ -426,18 +426,15 @@ class YMazeAnalysis(DLCDataset):
         )
         data = data[nose2wither < np.square(100)]
 
-        # arm position
         arm_tags = ["A", "B", "C"]
-        temp_arms = ArmCollection()
+        ref_pt = []
+        #temp_arms = ArmCollection()
         for a in arm_tags:
-            arm = ArmRegion(a)
-            for c in range(1, 5):
-                name = f"Arm{a}_{c}"
-                mask = data[name, "likelihood"] > 0.98
-                ix, iy = data.loc[mask, idx[name, ["x", "y"]]].median().astype(int)
-                arm.add_point(ix, iy)
-            temp_arms.append(arm)
-        ref_pt = temp_arms.each_arm_center
+            name = [f"Arm{a}_{c+1}" for c in range(4)]
+            mask = data.loc[:, idx[name, "likelihood"]] > 0.98
+            xy = data.loc[mask.values, idx[name, ["x","y"]]].median()
+            arm_center = xy.loc[idx[name, ["x"]]].mean(), xy.loc[idx[name, ["y"]]].mean()
+            ref_pt.append(arm_center)
 
         # fit the abstract arm by DeepLabCut coordinates
         arms: ArmCollection = BasicYMazeCollection()
