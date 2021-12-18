@@ -389,6 +389,7 @@ class YMazeAnalysis(DLCDataset):
 
     def __setstate__(self, d: Mapping[str, Any]) -> None:
         super().__setstate__(d)
+        self.savedir = self.homedir.joinpath("save", f"{self.time}min")
         self.analyze()
 
     def __getstate__(self) -> Dict[str, Any]:

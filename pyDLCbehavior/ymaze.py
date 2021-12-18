@@ -16,11 +16,46 @@ import cv2
 import matplotlib as mpl
 import numpy as np
 from matplotlib.patches import Polygon
+from math import sqrt
 
+SQRT3 = sqrt(3)
 
 class Point(NamedTuple):
     x: Number = np.nan
     y: Number = np.nan
+
+    def __add__(self, other: "Point"):
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError()
+        return Point(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other: "Point"):
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError()
+        return Point(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, scalar):
+        if not isinstance(scalar, Number):
+            raise NotImplementedError()
+        return Point(self.x * scalar, self.y * scalar)
+
+    def __neg__(self):
+        return Point(self.x * (-1), self.y * (-1))
+
+def P(r: float, theta: float, origin=(0, 0)) -> Point:
+    """Get x, y coordinate by radius and length
+
+    Args:
+        r (float): distance to origin
+        theta (float): rotation degree from axis-x (deg)
+
+    Returns:
+        Point: x, y point
+    """
+    from math import cos, sin, radians
+    x = np.round(cos(radians(theta)) * r + origin[0], 3)
+    y = np.round(sin(radians(theta)) * r + origin[1], 3)
+    return Point(x,y)
 
 
 def sort_coordinates(
@@ -191,12 +226,8 @@ class YMazeScaler(PixelScaler):
     reference: List[Tuple[int, int]] = field(init=False)
 
     def __post_init__(self):
-        from math import cos, radians, sin
-
-        pt = lambda θ: Point(cos(radians(θ)), sin(radians(θ)))
-        R = 40
-        self.reference = np.array([pt(30), pt(150), pt(270)]) * R
-        self.reference -= self.reference.min(axis=0)
+        r = 35 + 6/SQRT3
+        self.reference = np.array([P(r, 150), P(r, 270), P(r, 30)])
         super().__post_init__()
 
 
@@ -360,13 +391,21 @@ class ArmCollection:
         ax.add_patch(poly)
 
 
+
+
+
 @dataclass
 class BasicYMazeCollection(ArmCollection):
     def __post_init__(self):
-        o_pts = [(49.892, 24.708), (57.584, 38.151), (41.865, 38.354)]
-        a_pts = [(12.051, 21.698), (0.124, 15.035), (7.987, 0.789), (19.831, 7.553)]
-        b_pts = [(80.506, 6.719), (91.603, 0.125), (99.873, 14.080), (87.996, 20.840)]
-        c_pts = [(58.059, 72.516), (58.224, 85.998), (42.099, 85.886), (42.032, 72.516)]
+        r = 12 / SQRT3
+        p1, p2, p3 = P(r, 90), P(r, 210), P(r, 330)
+        a1, a2, a3, a4 = P(30, 150, p2), P(40, 150, p2), P(40, 150, p1), P(30, 150, p1)
+        b1, b2, b3, b4 = P(30, 30, p1), P(40, 30, p1), P(40, 30, p3), P(30, 30, p3)
+        c1, c2, c3, c4 = P(30, 270, p3), P(40, 270, p3), P(40, 270, p2), P(30, 270, p2)
+        o_pts = [p1, p2, p3]
+        a_pts = [a1, a2, a3, a4]
+        b_pts = [b1, b2, b3, b4]
+        c_pts = [c1, c2, c3, c4]
         all_pts = o_pts + a_pts + b_pts + c_pts
         self.data = OrderedDict(
             A=ArmRegion("A", a_pts),
