@@ -42,6 +42,10 @@ class Point(NamedTuple):
     def __neg__(self):
         return Point(self.x * (-1), self.y * (-1))
 
+    def __repr__(self):
+        return f"Point(x={self.x:.2f},y={self.y:.2f})"
+
+
 def P(r: float, theta: float, origin=(0, 0)) -> Point:
     """Get x, y coordinate by radius and length
 
@@ -76,7 +80,7 @@ def sort_coordinates(
         points = np.array(points)
 
     if points.ndim != 2 and points[1] != 2:
-        raise ValueError("input size must be (N, 2)")
+        raise ValueError(f"input size{points.shape} is not (N, 2)")
 
     sub_np = points - points.mean(axis=0)
     degree = -np.degrees(np.arctan2(sub_np[:, 1], sub_np[:, 0])) - 135
@@ -166,7 +170,7 @@ class Line:
         d = (det(self.pt1, self.pt2), det(other.pt1, other.pt2))
         x = det(d, xdiff) / div
         y = det(d, ydiff) / div
-        return Point()
+        return Point(x, y)
 
 
 @dataclass
@@ -179,7 +183,7 @@ class PixelScaler:
         target_num = len(self.target)
         ref_num = len(self.reference)
         if (ref_num != target_num) or (ref_num < 2) or (len(self.reference[0]) != 2):
-            raise ValueError("shape are not (N, 2), N > 1.")
+            raise ValueError(f"shape are not (N, 2), N > 1.\ntarget   : {self.target}\nreference: {self.reference}")
 
         ref_np = sort_coordinates(self.reference)
         target_np = sort_coordinates(self.target)
@@ -212,7 +216,7 @@ class PixelScaler:
         shape = xy_coords.shape
         ndim = xy_coords.ndim
         if ndim < 2 or shape[-1] != 2:
-            raise TypeError("src shape should be  (N, 2) or (M, N, 2)")
+            raise TypeError(f"src shape{xy_coords.shape} is not (N, 2) or (M, N, 2)")
         pad_width = [(0, 0) for _ in range(ndim - 1)]
         pad_width.append((0, 1))
         return np.pad(xy_coords, pad_width=pad_width, constant_values=1).dot(
@@ -373,22 +377,23 @@ class ArmCollection:
     def sort(self) -> None:
         self.area.sort()
 
-    def get_ymaze_verts_by_coords(self):
-        lines = self.area.get_paired_lines()
-        center = np.array(self.center)
-        is_close = lambda pt: 1e4 > np.sum(np.square(np.array(pt) - center))
-        temp = self.area.copy()
-        for i in range(len(lines)):
-            l1 = lines[i - 2]
-            l2 = lines[i]
-            x, y = l1.cal_intersection(l2)
-            if is_close((x, y)):
-                temp.add_point(x, y)
-        return temp.points
-
-    def draw_ymaze_contour(self, ax, *arg, **kwargs):
+    def draw_contour(self, ax, *arg, **kwargs):
         poly = Polygon(self.area.points, *arg, **kwargs)
         ax.add_patch(poly)
+
+    # def get_ymaze_verts_by_coords(self):
+    #     lines = self.area.get_paired_lines()
+    #     center = np.array(self.center)
+    #     is_close = lambda pt: 1e4 > np.sum(np.square(np.array(pt) - center))
+    #     temp = self.area.copy()
+    #     for i in range(len(lines)):
+    #         l1 = lines[i - 2]
+    #         l2 = lines[i]
+    #         x, y = l1.cal_intersection(l2)
+    #         if is_close((x, y)):
+    #             temp.add_point(x, y)
+    #     return temp.points
+
 
 
 

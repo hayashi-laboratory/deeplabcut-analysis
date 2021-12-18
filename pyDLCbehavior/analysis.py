@@ -465,14 +465,17 @@ class YMazeAnalysis(DLCDataset):
         xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms["A"].center], axis=0)[0])
 
         scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
-
+        
         withers = data.loc[:, idx["Withers", ["x", "y"]]].droplevel(0, axis=1).copy()
 
         # Set the rolling time window as 5
         rolling_window = "5s"
         withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
-
+        
         scaler = YMazeScaler([arms["A"].center, arms["B"].center, arms["C"].center])
+        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        self.scale_x = abs(pt1[0] - pt2[0])
+        self.scale_y = abs(pt1[1] - pt2[1])
 
         withers[["x", "y"]] = scaler.scale(withers.values)
         # withers["x"] = withers["x"] * scale_x
@@ -569,7 +572,7 @@ class YMazeAnalysis(DLCDataset):
             filter_withers = data.loc[data["mask"] == label, "Withers"]
             ax.plot(filter_withers.x, filter_withers.y)
 
-        self.arms.draw_ymaze_contour(ax, facecolor="0.9", edgecolor="0.5")
+        self.arms.draw_contour(ax, facecolor="0.9", edgecolor="0.5")
 
         width, height = self.frame_dimensions
         ax.set_xlim(0, width)

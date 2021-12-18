@@ -31,9 +31,11 @@ class DLCDataset:
     def __post_init__(self):
         # convert all path to patlib.Path
         self.csv_path = Path(self.csv_path)
-        assert self.csv_path.exists(), "csv is not exist"
+        if not self.csv_path.exists():
+            raise FileNotFoundError(self.csv_path)
         self.pkl_path = Path(self.pkl_path)
-        assert self.pkl_path.exists(), "pickle is not exist"
+        if not self.pkl_path.exists():
+            raise FileNotFoundError(self.pkl_path)
         self.video_path = Path(self.video_path)
         self.homedir = self.csv_path.parent
 
@@ -95,7 +97,7 @@ class DLCDataset:
         else:
             raw = pd.read_csv(self.csv_path, header=[0, 1, 2], index_col=0)
         # Add timestamp index to raw data
-        frame_interval = timedelta(milliseconds=1000 / self.FPS)
+        frame_interval = timedelta(milliseconds=1e3 / self.FPS)
         raw.index = raw.index * frame_interval
         self.raw_data = raw
 
@@ -116,5 +118,5 @@ class DLCDataset:
     @staticmethod
     def from_pickle(pickle_path: Union[str, Path]):
         if not Path(pickle_path).exists():
-            raise FileExistsError(str(pickle_path))
+            raise FileNotFoundError(str(pickle_path))
         return pd.read_pickle(Path(pickle_path))
