@@ -1,0 +1,13 @@
+wheel
+numpy
+pandas
+matplotlib
+xlrd
+opencv-python
+scipy
+joblib
+jupyterlab
+dataclasses
+ruamel.yaml
+easydict
+tqdm
