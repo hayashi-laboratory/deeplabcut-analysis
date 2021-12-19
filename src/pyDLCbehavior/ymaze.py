@@ -19,6 +19,8 @@ from matplotlib.patches import Polygon
 from math import sqrt
 
 __all__ = [
+    "Point",
+    "Line",
     "sort_coordinates",
     "PixelScaler",
     "YMazeScaler",
