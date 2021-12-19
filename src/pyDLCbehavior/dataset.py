@@ -4,7 +4,7 @@ from typing import Dict, Any, Mapping, Union, NamedTuple
 from datetime import timedelta
 import pandas as pd
 
-__all__ = ["DLCDataset"]
+__all__ = ["DLCDataset", "FrameDimesion"]
 
 
 class FrameDimension(NamedTuple):
