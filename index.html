@@ -26,10 +26,27 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .analysis import YMazeAnalysis, NovelObjectRecognitionAnalysis
+<pre><code class="python">import pkg_resources
+
+__version__ = pkg_resources.get_distribution(&#34;pyDLCbehavior&#34;).version
+from .analysis import YMazeAnalysis, NovelObjectRecognitionAnalysis
 from .utility import setrois, glob_files, Roi
 from .ymaze import YMazeScaler, BasicYMazeCollection, ArmCollection, ArmRegion
-from .dataset import DLCDataset</code></pre>
+from .dataset import DLCDataset
+
+
+__all__ = [
+    &#34;YMazeAnalysis&#34;,
+    &#34;NovelObjectRecognitionAnalysis&#34;,
+    &#34;setrois&#34;,
+    &#34;glob_files&#34;,
+    &#34;Roi&#34;,
+    &#34;YMazeScaler&#34;,
+    &#34;BasicYMazeCollection&#34;,
+    &#34;ArmCollection&#34;,
+    &#34;ArmRegion&#34;,
+    &#34;DLCDataset&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -56,8 +73,2819 @@ from .dataset import DLCDataset</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="pyDLCbehavior.glob_files"><code class="name flex">
+<span>def <span class="ident">glob_files</span></span>(<span>parent: pathlib.Path) ‑> Dict[str, List[pathlib.Path]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Glob files in all sub-directories and sorted by suffix</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>parent directory to be glob</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Dict[str, List[Path]]</code></dt>
+<dd>A dict collection with suffix as key</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def glob_files(parent: Path) -&gt; Dict[str, List[Path]]:
+    &#34;&#34;&#34;Glob files in all sub-directories and sorted by suffix
+
+    Args:
+        path (Path): parent directory to be glob
+
+    Returns:
+        Dict[str, List[Path]]: A dict collection with suffix as key
+    &#34;&#34;&#34;
+
+    path_dict = {}
+    for file in Path(parent).glob(&#34;**/*&#34;):
+        if not file.is_file() or file.name.startswith(&#34;.&#34;):
+            continue
+        key = file.suffix
+        path_dict[key] = path_dict.get(key, list())
+        path_dict[key].append(file)
+    return path_dict</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.setrois"><code class="name flex">
+<span>def <span class="ident">setrois</span></span>(<span>videopath: str, num_of_objects: int) ‑> List[<a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Manual selection region of interest from video</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>videopath</code></strong> :&ensp;<code>str</code></dt>
+<dd>video to be selected</dd>
+<dt><strong><code>num_of_objects</code></strong> :&ensp;<code>int</code></dt>
+<dd>number of ROI to be selected</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>File is not available</dd>
+<dt><code>FileNotFoundError</code></dt>
+<dd>Opencv fail to open the video</dd>
+<dt><code>KeyboardInterrupt</code></dt>
+<dd>Roi selection was cancelled</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[<a title="pyDLCbehavior.Roi" href="#pyDLCbehavior.Roi">Roi</a>]</code></dt>
+<dd>A list of Roi instance.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
+    &#34;&#34;&#34;Manual selection region of interest from video
+
+    Args:
+        videopath (str): video to be selected
+        num_of_objects (int): number of ROI to be selected
+
+    Raises:
+        FileNotFoundError: File is not available
+        FileNotFoundError: Opencv fail to open the video
+        KeyboardInterrupt: Roi selection was cancelled
+
+    Returns:
+        List[Roi]: A list of Roi instance.
+    &#34;&#34;&#34;
+    from IPython.display import clear_output
+
+    if not isinstance(videopath, Path):
+        videopath = Path(videopath)
+
+    if not (videopath.exists() and videopath.is_file()):
+        raise FileNotFoundError(
+            f&#34;{videopath.name} is not existed. Please check your videopath&#34;
+        )
+
+    cap = cv2.VideoCapture(str(videopath))
+
+    if not cap.isOpened():
+        raise FileNotFoundError(f&#34;Could not open the video {videopath.name}&#34;)
+
+    while True:
+        ok, frame = cap.read()
+        if ok:
+            break
+    cap.release()
+
+    windowname = videopath.name.split(&#34;_&#34;)[1]
+    rois = []
+
+    cv2.namedWindow(windowname)
+    cv2.startWindowThread()
+    try:
+        for i in range(num_of_objects):
+            print(f&#34;\033[92m[SYSTEM] Please select Zone-{i}\033[0m&#34;)
+            x, y, width, height = cv2.selectROI(windowname, frame, False, False)
+            cv2.waitKey(1)
+            if x * y * width * height == 0:
+                break
+            roi = Roi(i, x, y, width, height)
+            frame = roi.draw(frame)
+            rois.append(roi)
+            clear_output()
+        frame_height = frame.shape[0]
+        msg = &#34;Press `Space or Enter` to confirm ROI.\nPress `R` to re-select.\nPress `esc or c` to break the process&#34;
+        print(&#34;\033[92m&#34; + msg + &#34;\033[0m&#34;)
+        putText = lambda frame, msg, y_pos: cv2.putText(
+            frame,
+            msg,
+            (2, y_pos),
+            cv2.FONT_HERSHEY_PLAIN,
+            1.25,
+            color=(10, 255, 255),
+            thickness=2,
+            lineType=cv2.LINE_AA,
+        )
+        msg_lines = msg.split(&#34;\n&#34;)
+        for i, m in enumerate(msg_lines):
+            text_y_pos = frame_height - (len(msg_lines) - i) * 22 + 10
+            putText(frame, m, y_pos=text_y_pos)
+
+        while True:
+            cv2.imshow(windowname, frame)
+            ret = cv2.waitKey(33) &amp; 0xFF
+
+            if ret in (27, 99):  # esc or c
+                raise KeyboardInterrupt(&#34;Cancel the selection&#34;)
+
+            if ret in (13, 32):  # space or enter
+                break
+
+            if ret == 114:  # r
+                return setrois(videopath, num_of_objects)
+        return rois
+
+    finally:
+        clear_output()
+        cv2.destroyAllWindows()
+        cv2.waitKey(1)</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pyDLCbehavior.ArmCollection"><code class="flex name class">
+<span>class <span class="ident">ArmCollection</span></span>
+<span>(</span><span>data: OrderedDict[str, <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ArmCollection(data: OrderedDict[str, pyDLCbehavior.ymaze.ArmRegion] = <factory>)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ArmCollection:
+
+    data: OrderedDict[str, ArmRegion] = field(default_factory=OrderedDict)
+    area: ArmRegion = field(init=False, repr=False, default_factory=ArmRegion)
+
+    @property
+    def center(self):
+        return self.area.center
+
+    @property
+    def each_arm_center(self):
+        return [a.center for a in self.data.values()]
+
+    def __getstate__(self):
+        return dict(data=self.data, area=self.area)
+
+    def __setstate__(self, d):
+        self.__dict__.update(d)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, key: Hashable):
+        return self.data[key]
+
+    def __iter__(self) -&gt; Generator[ArmRegion, None, None]:
+        for key in self.data.keys():
+            yield key
+
+    def keys(self) -&gt; Generator[str, None, None]:
+        return self.data.keys()
+
+    def values(self) -&gt; Generator[ArmRegion, None, None]:
+        return self.data.values()
+
+    def items(self) -&gt; Generator[Tuple[str, ArmRegion], None, None]:
+        return self.data.items()
+
+    def get(self, key, default=None):
+        return self.data.get(key, default)
+
+    def remove(self, item: Any) -&gt; None:
+        self.data = OrderedDict([(k, v) for k, v in self.data.items() if v != item])
+
+    def append(self, arm_region: ArmRegion):
+        if not isinstance(arm_region, ArmRegion):
+            raise NotImplementedError
+        self.data[arm_region.name] = arm_region
+        self.area.merge(arm_region)
+
+    def sort(self) -&gt; None:
+        self.area.sort()
+
+    def draw_contour(self, ax, *arg, **kwargs):
+        poly = Polygon(self.area.points, *arg, **kwargs)
+        ax.add_patch(poly)
+
+    # def get_ymaze_verts_by_coords(self):
+    #     lines = self.area.get_paired_lines()
+    #     center = np.array(self.center)
+    #     is_close = lambda pt: 1e4 &gt; np.sum(np.square(np.array(pt) - center))
+    #     temp = self.area.copy()
+    #     for i in range(len(lines)):
+    #         l1 = lines[i - 2]
+    #         l2 = lines[i]
+    #         x, y = l1.cal_intersection(l2)
+    #         if is_close((x, y)):
+    #             temp.add_point(x, y)
+    #     return temp.points</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.ymaze.BasicYMazeCollection" href="ymaze.html#pyDLCbehavior.ymaze.BasicYMazeCollection">BasicYMazeCollection</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.ArmCollection.area"><code class="name">var <span class="ident">area</span> : <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.data"><code class="name">var <span class="ident">data</span> : OrderedDict[str, <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyDLCbehavior.ArmCollection.center"><code class="name">var <span class="ident">center</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def center(self):
+    return self.area.center</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.each_arm_center"><code class="name">var <span class="ident">each_arm_center</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def each_arm_center(self):
+    return [a.center for a in self.data.values()]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.ArmCollection.append"><code class="name flex">
+<span>def <span class="ident">append</span></span>(<span>self, arm_region: <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def append(self, arm_region: ArmRegion):
+    if not isinstance(arm_region, ArmRegion):
+        raise NotImplementedError
+    self.data[arm_region.name] = arm_region
+    self.area.merge(arm_region)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.draw_contour"><code class="name flex">
+<span>def <span class="ident">draw_contour</span></span>(<span>self, ax, *arg, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_contour(self, ax, *arg, **kwargs):
+    poly = Polygon(self.area.points, *arg, **kwargs)
+    ax.add_patch(poly)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self, key, default=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get(self, key, default=None):
+    return self.data.get(key, default)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.items"><code class="name flex">
+<span>def <span class="ident">items</span></span>(<span>self) ‑> Generator[Tuple[str, <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>], None, None]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def items(self) -&gt; Generator[Tuple[str, ArmRegion], None, None]:
+    return self.data.items()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.keys"><code class="name flex">
+<span>def <span class="ident">keys</span></span>(<span>self) ‑> Generator[str, None, None]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def keys(self) -&gt; Generator[str, None, None]:
+    return self.data.keys()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.remove"><code class="name flex">
+<span>def <span class="ident">remove</span></span>(<span>self, item: Any) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove(self, item: Any) -&gt; None:
+    self.data = OrderedDict([(k, v) for k, v in self.data.items() if v != item])</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.sort"><code class="name flex">
+<span>def <span class="ident">sort</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sort(self) -&gt; None:
+    self.area.sort()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmCollection.values"><code class="name flex">
+<span>def <span class="ident">values</span></span>(<span>self) ‑> Generator[<a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>, None, None]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def values(self) -&gt; Generator[ArmRegion, None, None]:
+    return self.data.values()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion"><code class="flex name class">
+<span>class <span class="ident">ArmRegion</span></span>
+<span>(</span><span>name: str = '', points: List[<a title="pyDLCbehavior.ymaze.Point" href="ymaze.html#pyDLCbehavior.ymaze.Point">Point</a>] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ArmRegion(name: str = '', points: List[pyDLCbehavior.ymaze.Point] = <factory>)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ArmRegion:
+
+    name: str = &#34;&#34;
+    points: List[Point] = field(default_factory=list)
+
+    def __post_init__(self):
+        if len(self.points):
+            self.sort()
+
+    def __setstate__(self, d):
+        self.__dict__.update(d)
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        return dict(name=self.name, points=self.points)
+
+    @property
+    def center(self) -&gt; None:
+        if not len(self.points):
+            return Point()
+        return Point(*np.array(self.points).mean(axis=0))
+
+    def is_valid(self, x, y) -&gt; bool:
+        if x is None or y is None:
+            return False
+        if np.isnan(x) or np.isnan(y):
+            return False
+        return True
+
+    def get_paired_lines(self) -&gt; List[Line]:
+        num = len(self.points)
+        if not num:
+            return list()
+        return [Line(self.points[i - 1], self.points[i]) for i in range(num)]
+
+    def sort(self):
+        self.points = [tuple(pt) for pt in sort_coordinates(self.points)]
+
+    def add_point(self, x: int, y: int):
+        &#34;&#34;&#34;Add a new point to area corner
+
+        Args:
+            x (int): x-coordinates
+            y (int): y-coordinates
+
+        Raises:
+            ValueError: Value should be numeric and not nan.
+        &#34;&#34;&#34;
+        if not self.is_valid(x, y):
+            raise ValueError(f&#34;invalid value ({x}, {y})&#34;)
+        self.points.append(Point(x, y))
+        self.sort()
+
+    def add_points(self, xy_coords: List[Point]):
+        self.points.extend([Point(*pt) for pt in xy_coords])
+        self.sort()
+
+    def contains(self, x: float, y: float) -&gt; bool:
+        &#34;&#34;&#34;A function to check whether point is in Arm area (closed)
+
+        Args:
+            x (float): x-coordinates
+            y (float): y-coordinates
+        &#34;&#34;&#34;
+        if len(self.points) &lt; 3:
+            return False
+        polygon = mpl.path.Path(self.points)
+        return polygon.contains_point((x, y))
+
+    def draw_area(self, ax, *args, **kwargs) -&gt; None:
+        if not self.points:
+            return
+        poly = Polygon(self.points, *args, **kwargs)
+        ax.add_patch(poly)
+
+    def merge(self, other: &#34;ArmRegion&#34;) -&gt; &#34;ArmRegion&#34;:
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError()
+        self.points.extend(other.points)
+        self.sort()
+        return self
+
+    def copy(self) -&gt; &#34;ArmRegion&#34;:
+        r = ArmRegion(self.name)
+        r.points = [p for p in self.points]
+        return r</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.ArmRegion.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.points"><code class="name">var <span class="ident">points</span> : List[<a title="pyDLCbehavior.ymaze.Point" href="ymaze.html#pyDLCbehavior.ymaze.Point">Point</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyDLCbehavior.ArmRegion.center"><code class="name">var <span class="ident">center</span> : None</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def center(self) -&gt; None:
+    if not len(self.points):
+        return Point()
+    return Point(*np.array(self.points).mean(axis=0))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.ArmRegion.add_point"><code class="name flex">
+<span>def <span class="ident">add_point</span></span>(<span>self, x: int, y: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a new point to area corner</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>int</code></dt>
+<dd>x-coordinates</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>int</code></dt>
+<dd>y-coordinates</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>Value should be numeric and not nan.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_point(self, x: int, y: int):
+    &#34;&#34;&#34;Add a new point to area corner
+
+    Args:
+        x (int): x-coordinates
+        y (int): y-coordinates
+
+    Raises:
+        ValueError: Value should be numeric and not nan.
+    &#34;&#34;&#34;
+    if not self.is_valid(x, y):
+        raise ValueError(f&#34;invalid value ({x}, {y})&#34;)
+    self.points.append(Point(x, y))
+    self.sort()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.add_points"><code class="name flex">
+<span>def <span class="ident">add_points</span></span>(<span>self, xy_coords: List[<a title="pyDLCbehavior.ymaze.Point" href="ymaze.html#pyDLCbehavior.ymaze.Point">Point</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_points(self, xy_coords: List[Point]):
+    self.points.extend([Point(*pt) for pt in xy_coords])
+    self.sort()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.contains"><code class="name flex">
+<span>def <span class="ident">contains</span></span>(<span>self, x: float, y: float) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A function to check whether point is in Arm area (closed)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>float</code></dt>
+<dd>x-coordinates</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>float</code></dt>
+<dd>y-coordinates</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def contains(self, x: float, y: float) -&gt; bool:
+    &#34;&#34;&#34;A function to check whether point is in Arm area (closed)
+
+    Args:
+        x (float): x-coordinates
+        y (float): y-coordinates
+    &#34;&#34;&#34;
+    if len(self.points) &lt; 3:
+        return False
+    polygon = mpl.path.Path(self.points)
+    return polygon.contains_point((x, y))</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.copy"><code class="name flex">
+<span>def <span class="ident">copy</span></span>(<span>self) ‑> <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def copy(self) -&gt; &#34;ArmRegion&#34;:
+    r = ArmRegion(self.name)
+    r.points = [p for p in self.points]
+    return r</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.draw_area"><code class="name flex">
+<span>def <span class="ident">draw_area</span></span>(<span>self, ax, *args, **kwargs) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_area(self, ax, *args, **kwargs) -&gt; None:
+    if not self.points:
+        return
+    poly = Polygon(self.points, *args, **kwargs)
+    ax.add_patch(poly)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.get_paired_lines"><code class="name flex">
+<span>def <span class="ident">get_paired_lines</span></span>(<span>self) ‑> List[<a title="pyDLCbehavior.ymaze.Line" href="ymaze.html#pyDLCbehavior.ymaze.Line">Line</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_paired_lines(self) -&gt; List[Line]:
+    num = len(self.points)
+    if not num:
+        return list()
+    return [Line(self.points[i - 1], self.points[i]) for i in range(num)]</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.is_valid"><code class="name flex">
+<span>def <span class="ident">is_valid</span></span>(<span>self, x, y) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_valid(self, x, y) -&gt; bool:
+    if x is None or y is None:
+        return False
+    if np.isnan(x) or np.isnan(y):
+        return False
+    return True</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.merge"><code class="name flex">
+<span>def <span class="ident">merge</span></span>(<span>self, other: <a title="pyDLCbehavior.ArmRegion" href="#pyDLCbehavior.ArmRegion">ArmRegion</a>) ‑> <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def merge(self, other: &#34;ArmRegion&#34;) -&gt; &#34;ArmRegion&#34;:
+    if not isinstance(other, self.__class__):
+        raise NotImplementedError()
+    self.points.extend(other.points)
+    self.sort()
+    return self</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.ArmRegion.sort"><code class="name flex">
+<span>def <span class="ident">sort</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sort(self):
+    self.points = [tuple(pt) for pt in sort_coordinates(self.points)]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pyDLCbehavior.BasicYMazeCollection"><code class="flex name class">
+<span>class <span class="ident">BasicYMazeCollection</span></span>
+<span>(</span><span>data: OrderedDict[str, <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>BasicYMazeCollection(data: OrderedDict[str, pyDLCbehavior.ymaze.ArmRegion] = <factory>)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class BasicYMazeCollection(ArmCollection):
+    def __post_init__(self):
+        r = 12 / SQRT3
+        p1, p2, p3 = P(r, 90), P(r, 210), P(r, 330)
+        a1, a2, a3, a4 = P(30, 150, p2), P(40, 150, p2), P(40, 150, p1), P(30, 150, p1)
+        b1, b2, b3, b4 = P(30, 30, p1), P(40, 30, p1), P(40, 30, p3), P(30, 30, p3)
+        c1, c2, c3, c4 = P(30, 270, p3), P(40, 270, p3), P(40, 270, p2), P(30, 270, p2)
+        o_pts = [p1, p2, p3]
+        a_pts = [a1, a2, a3, a4]
+        b_pts = [b1, b2, b3, b4]
+        c_pts = [c1, c2, c3, c4]
+        all_pts = o_pts + a_pts + b_pts + c_pts
+        self.data = OrderedDict(
+            A=ArmRegion(&#34;A&#34;, a_pts),
+            B=ArmRegion(&#34;B&#34;, b_pts),
+            C=ArmRegion(&#34;C&#34;, c_pts),
+        )
+        self.area.points = all_pts
+        self.sort()
+
+    def fit(
+        self,
+        reference_points: List[Point],
+    ) -&gt; None:
+        &#34;&#34;&#34;Fit the mask of YMaze to the center of 3 arms.
+        Args:
+            reference_points (List[Point]): The reference center points with the order [ArmA, ArmB, ArmC]
+        &#34;&#34;&#34;
+        s = PixelScaler(self.each_arm_center, reference_points)
+        np2pts = lambda l: [Point(*p) for p in l]
+        for v in self.data.values():
+            v.points = np2pts(s.scale(v.points))
+        self.area.points = np2pts(s.scale(self.area.points))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.ymaze.ArmCollection" href="ymaze.html#pyDLCbehavior.ymaze.ArmCollection">ArmCollection</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.BasicYMazeCollection.area"><code class="name">var <span class="ident">area</span> : <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.BasicYMazeCollection.data"><code class="name">var <span class="ident">data</span> : OrderedDict[str, <a title="pyDLCbehavior.ymaze.ArmRegion" href="ymaze.html#pyDLCbehavior.ymaze.ArmRegion">ArmRegion</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.BasicYMazeCollection.fit"><code class="name flex">
+<span>def <span class="ident">fit</span></span>(<span>self, reference_points: List[<a title="pyDLCbehavior.ymaze.Point" href="ymaze.html#pyDLCbehavior.ymaze.Point">Point</a>]) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fit the mask of YMaze to the center of 3 arms.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>reference_points</code></strong> :&ensp;<code>List[Point]</code></dt>
+<dd>The reference center points with the order [ArmA, ArmB, ArmC]</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fit(
+    self,
+    reference_points: List[Point],
+) -&gt; None:
+    &#34;&#34;&#34;Fit the mask of YMaze to the center of 3 arms.
+    Args:
+        reference_points (List[Point]): The reference center points with the order [ArmA, ArmB, ArmC]
+    &#34;&#34;&#34;
+    s = PixelScaler(self.each_arm_center, reference_points)
+    np2pts = lambda l: [Point(*p) for p in l]
+    for v in self.data.values():
+        v.points = np2pts(s.scale(v.points))
+    self.area.points = np2pts(s.scale(self.area.points))</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset"><code class="flex name class">
+<span>class <span class="ident">DLCDataset</span></span>
+<span>(</span><span>csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DLCDataset(csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class DLCDataset:
+    # file path
+    csv_path: Path
+    pkl_path: Path
+    video_path: Path = field(default=&#34;&#34;)
+    homedir: Path = field(init=False)
+
+    # pickle data
+    hyperparams: Dict[str, Any] = field(init=False, repr=False, default=None)
+    dlc_model_config: Dict[str, Any] = field(init=False, repr=False, default=None)
+    # video parameters
+    FPS: float = field(init=False, default=None)
+    frame_dimensions: FrameDimension = field(init=False, default_factory=FrameDimension)
+
+    # raw_data
+    raw_data: pd.DataFrame = field(init=False, repr=False, default=None)
+
+    def __post_init__(self):
+        # convert all path to patlib.Path
+        self.csv_path = Path(self.csv_path)
+        if not self.csv_path.exists():
+            raise FileNotFoundError(self.csv_path)
+        self.pkl_path = Path(self.pkl_path)
+        if not self.pkl_path.exists():
+            raise FileNotFoundError(self.pkl_path)
+        self.video_path = Path(self.video_path)
+        self.homedir = self.csv_path.parent
+
+        # load pickle file that generate from DeepLabCut
+        data: dict = pd.read_pickle(self.pkl_path).get(&#34;data&#34;, dict())
+
+        if &#34;DLC-model-config file&#34; in data:
+            self.dlc_model_config = data[&#34;DLC-model-config file&#34;]
+            del data[&#34;DLC-model-config file&#34;]
+
+        # load the video data from data
+        self.FPS = data.get(&#34;fps&#34;)
+
+        height, width = data.get(&#34;frame_dimensions&#34;, (-1, -1))
+
+        self.frame_dimensions = FrameDimension(width, height)
+        self.hyperparams = data
+        self.load_csv()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        &#34;&#34;&#34;A function that called when unpickling the NorDlcAnalysis class
+
+        Args:
+            d (Mapping[str, int]): data to be unpickled
+        &#34;&#34;&#34;
+
+        # convert all path and file dir into pathlib.Path
+        for key, val in d.items():
+            if not isinstance(val, str):
+                continue
+            if key.lower().endswith((&#34;path&#34;, &#34;dir&#34;)):
+                d[key] = Path(val)
+        # convert the string path to pathlib.Path
+        self.__dict__.update(d)
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        &#34;&#34;&#34;Called when pickleing the DLC Dataset
+
+        Returns:
+            Dict[str, int]: dict to be pickled
+        &#34;&#34;&#34;
+        return dict(
+            csv_path=str(self.csv_path),
+            pkl_path=str(self.pkl_path),
+            video_path=str(self.video_path),
+            homedir=str(self.homedir),
+            hyperparams=self.hyperparams,
+            dlc_model_config=self.dlc_model_config,
+            FPS=self.FPS,
+            frame_dimensions=self.frame_dimensions,
+            raw_data=self.raw_data,
+        )
+
+    def load_csv(self) -&gt; None:
+        &#34;&#34;&#34;Load the csv file and add a timestamp index&#34;&#34;&#34;
+        # load data
+        if self.csv_path.suffix in [&#34;.xlsx&#34;, &#34;.xls&#34;]:
+            raw = pd.read_excel(self.csv_path, header=[0, 1, 2], index_col=0)
+        else:
+            raw = pd.read_csv(self.csv_path, header=[0, 1, 2], index_col=0)
+        # Add timestamp index to raw data
+        frame_interval = timedelta(milliseconds=1e3 / self.FPS)
+        raw.index = raw.index * frame_interval
+        self.raw_data = raw
+
+    def to_pickle(self, pickle_path=None) -&gt; Path:
+        if pickle_path is None:
+            pickle_path = self.homedir.joinpath(f&#34;{self.csv_path.stem}_analysis.pkl.gz&#34;)
+        else:
+            pickle_path = Path(pickle_path)
+
+        if pickle_path.suffix != &#34;.gz&#34;:
+            pickle_path = pickle_path.with_name(pickle_path.name + &#34;.gz&#34;)
+
+        print(&#34;Saving...&#34;)
+        pd.to_pickle(self, pickle_path)
+        print(f&#34;Compressed pickle was saved at \033[92m{pickle_path}\033[0m.&#34;)
+        return pickle_path
+
+    @staticmethod
+    def from_pickle(pickle_path: Union[str, Path]):
+        if not Path(pickle_path).exists():
+            raise FileNotFoundError(str(pickle_path))
+        return pd.read_pickle(Path(pickle_path))</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis" href="analysis.html#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis">NovelObjectRecognitionAnalysis</a></li>
+<li><a title="pyDLCbehavior.analysis.YMazeAnalysis" href="analysis.html#pyDLCbehavior.analysis.YMazeAnalysis">YMazeAnalysis</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.DLCDataset.FPS"><code class="name">var <span class="ident">FPS</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.csv_path"><code class="name">var <span class="ident">csv_path</span> : pathlib.Path</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.dlc_model_config"><code class="name">var <span class="ident">dlc_model_config</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.frame_dimensions"><code class="name">var <span class="ident">frame_dimensions</span> : <a title="pyDLCbehavior.dataset.FrameDimension" href="dataset.html#pyDLCbehavior.dataset.FrameDimension">FrameDimension</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.homedir"><code class="name">var <span class="ident">homedir</span> : pathlib.Path</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.hyperparams"><code class="name">var <span class="ident">hyperparams</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.pkl_path"><code class="name">var <span class="ident">pkl_path</span> : pathlib.Path</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.raw_data"><code class="name">var <span class="ident">raw_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.video_path"><code class="name">var <span class="ident">video_path</span> : pathlib.Path</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="pyDLCbehavior.DLCDataset.from_pickle"><code class="name flex">
+<span>def <span class="ident">from_pickle</span></span>(<span>pickle_path: Union[str, pathlib.Path])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def from_pickle(pickle_path: Union[str, Path]):
+    if not Path(pickle_path).exists():
+        raise FileNotFoundError(str(pickle_path))
+    return pd.read_pickle(Path(pickle_path))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.DLCDataset.load_csv"><code class="name flex">
+<span>def <span class="ident">load_csv</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load the csv file and add a timestamp index</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_csv(self) -&gt; None:
+    &#34;&#34;&#34;Load the csv file and add a timestamp index&#34;&#34;&#34;
+    # load data
+    if self.csv_path.suffix in [&#34;.xlsx&#34;, &#34;.xls&#34;]:
+        raw = pd.read_excel(self.csv_path, header=[0, 1, 2], index_col=0)
+    else:
+        raw = pd.read_csv(self.csv_path, header=[0, 1, 2], index_col=0)
+    # Add timestamp index to raw data
+    frame_interval = timedelta(milliseconds=1e3 / self.FPS)
+    raw.index = raw.index * frame_interval
+    self.raw_data = raw</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.DLCDataset.to_pickle"><code class="name flex">
+<span>def <span class="ident">to_pickle</span></span>(<span>self, pickle_path=None) ‑> pathlib.Path</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_pickle(self, pickle_path=None) -&gt; Path:
+    if pickle_path is None:
+        pickle_path = self.homedir.joinpath(f&#34;{self.csv_path.stem}_analysis.pkl.gz&#34;)
+    else:
+        pickle_path = Path(pickle_path)
+
+    if pickle_path.suffix != &#34;.gz&#34;:
+        pickle_path = pickle_path.with_name(pickle_path.name + &#34;.gz&#34;)
+
+    print(&#34;Saving...&#34;)
+    pd.to_pickle(self, pickle_path)
+    print(f&#34;Compressed pickle was saved at \033[92m{pickle_path}\033[0m.&#34;)
+    return pickle_path</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis"><code class="flex name class">
+<span>class <span class="ident">NovelObjectRecognitionAnalysis</span></span>
+<span>(</span><span>csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NovelObjectRecognitionAnalysis(csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class NovelObjectRecognitionAnalysis(DLCDataset):
+
+    # ROI
+    objects: List[Roi] = field(init=False, default_factory=list)
+
+    # raw_data
+    raw_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    scale_x: float = field(init=False, default=1)
+    scale_y: float = field(init=False, default=1)
+
+    # data after analysis
+    nose2obj: int = field(init=False, default=None)
+    offset: int = field(init=False, default=None)
+    data: pd.DataFrame = field(init=False, repr=False, default=None)
+    filter_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    climbing_filter: pd.DataFrame = field(init=False, repr=False, default=None)
+
+    # the summary from center trajectory
+    locomotion_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    total_distance: float = field(init=False, default=None)
+    mean_speed: float = field(init=False, default=None)
+
+    def __post_init__(self) -&gt; None:
+        # parse the path and load the pickle file
+        super().__post_init__()
+        self.preprocess()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        super().__setstate__(d)
+        self.analyze()
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        d = super().__getstate__()
+        d.update(
+            {
+                &#34;objects&#34;: self.objects,
+                &#34;nose2obj&#34;: self.nose2obj,
+                &#34;offset&#34;: self.offset,
+            }
+        )
+        return d
+
+    @property
+    def num_of_objects(self) -&gt; int:
+        return len(self.objects)
+
+    @property
+    def object_a(self) -&gt; Roi:
+        for o in self.objects:
+            if o.name.lower().endswith(&#34;a&#34;):
+                return o
+        raise AttributeError()
+
+    @property
+    def object_b(self) -&gt; Roi:
+        for o in self.objects:
+            if o.name.lower().endswith(&#34;b&#34;):
+                return o
+        raise AttributeError()
+
+    def select_objects(self, num_of_objects: int = 2) -&gt; None:
+        &#34;&#34;&#34;select the roi object manually.
+
+        Args:
+            num_of_objects (int, optional): How many object to be selected. Defaults to 2.
+        &#34;&#34;&#34;
+        self.objects = setrois(self.video_path, num_of_objects)
+
+    def add_object(self, obj: Roi) -&gt; None:
+        &#34;&#34;&#34;Add a Roi object manually.
+
+        Args:
+            obj (Roi): A Roi instance contains (x,y, width, height, name)
+
+        Raises:
+            TypeError: Raise error if input is not Roi instance
+        &#34;&#34;&#34;
+        if not isinstance(obj, Roi):
+            raise TypeError(&#34;obj should be Roi instance&#34;)
+        self.objects.append(obj)
+
+    def preprocess(self) -&gt; None:
+        &#34;&#34;&#34;filter the raw data by moving averaging&#34;&#34;&#34;
+        # drop the scorer columns
+        raw = self.raw_data.droplevel(0, axis=1)
+
+        # Rolling the data by 5 seconds to get the reliable start time.
+        # Using nose as target to calculate the rolling mean of likelihood
+        # Get the index when mean of likelihood is larger than 0.99
+        # default is the first items
+        all_joints_names = self.dlc_model_config[&#34;all_joints_names&#34;]
+        bodypart = all_joints_names[0]
+        if &#34;nose&#34; in all_joints_names:
+            bodypart = &#34;nose&#34;
+        elif &#34;center&#34; in all_joints_names:
+            bodypart = &#34;center&#34;
+
+        rolling_window = &#34;5s&#34;
+        df_MVA = raw[bodypart, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        start = df_MVA[df_MVA &gt; 0.99].index.min()
+        # Time window for 10 minutes
+        end = start + timedelta(minutes=10)
+        raw = raw[start:end]
+        # set data to class instance
+        self.raw_data = raw
+
+    def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+        if self.num_of_objects == 0:
+            print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
+            return
+
+        self.nose2obj = self.nose2obj or nose2obj
+        self.offset = self.offset or offset
+        # copy the data from raw_data
+        data = self.raw_data.copy()
+
+        # a convinient index for slice the multi-index
+        idx = pd.IndexSlice
+
+        # get body parts
+        part_names = data.columns.get_level_values(0).unique()
+        object_names = [c for c in part_names if &#34;obj&#34; in c.lower()]
+        bodyparts = [c for c in part_names if &#34;obj&#34; not in c.lower()]
+
+        # temp class that decide the distance to ROI and predict coordinates
+        from collections import namedtuple
+
+        Coords = namedtuple(&#34;Coords&#34;, [&#34;name&#34;, &#34;coords&#34;])
+        get_coord = lambda o: Coords(o, (data[o, &#34;x&#34;].mean(), data[o, &#34;y&#34;].mean()))
+        # list of Coords(name = name, coords = (x, y))
+        dlc_objs = [get_coord(o) for o in object_names]
+
+        for roi_obj in self.objects:
+            # automatic assign the object name by distance
+            name = min(dlc_objs, key=lambda x: roi_obj.distance(*x.coords)).name
+            if not roi_obj.name:
+                roi_obj.name = f&#34;ROI_{name}&#34;
+            data.loc[:, (roi_obj.name, &#34;x&#34;)] = roi_obj.x
+            data.loc[:, (roi_obj.name, &#34;y&#34;)] = roi_obj.y
+
+        part_names = data.columns.get_level_values(0).unique()
+        # object real distance (cm)
+        real_x_cm, real_y_cm = 20, 20
+        scale_x = real_x_cm / abs(self.objects[0].x - self.objects[1].x)
+        scale_y = real_y_cm / abs(self.objects[0].y - self.objects[1].y)
+        self.scale_x, self.scale_y = scale_x, scale_y
+        # scale all coordinates to real distance (cm)
+        data.loc[:, idx[:, &#34;x&#34;]] = data.loc[:, idx[:, &#34;x&#34;]] * scale_x
+        data.loc[:, idx[:, &#34;y&#34;]] = data.loc[:, idx[:, &#34;y&#34;]] * scale_y
+
+        # Get the distance between each bodypart and object
+        for roi_obj in self.objects:
+            # create the new column names for assign the distance
+            new_cols = pd.MultiIndex.from_tuples(
+                [(b, f&#34;distance_to_{roi_obj.name}&#34;) for b in bodyparts],
+                names=[&#34;bodyparts&#34;, &#34;coords&#34;],
+            )
+            scale_obj_x = roi_obj.x * scale_x
+            scale_obj_y = roi_obj.y * scale_y
+            data[new_cols] = np.sqrt(
+                np.square(data.loc[:, idx[bodyparts, &#34;x&#34;]].values - scale_obj_x)
+                + np.square(data.loc[:, idx[bodyparts, &#34;y&#34;]].values - scale_obj_y)
+            )
+        data = data[part_names]
+
+        # calculate the distance from nose to center
+        data[&#34;nose2center&#34;] = np.sqrt(
+            np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;x&#34;]]))
+            + np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;y&#34;]]))
+        )
+        self.data = data
+
+        # first filter all data by 15cm
+        # offset default is 15 cm
+        filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+
+        # took the center position
+        center = (
+            filter_data.loc[:, idx[&#34;center&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+        )
+        center[&#34;length&#34;] = np.sqrt(np.square(center.diff()).sum(axis=1))
+        center[&#34;distance&#34;] = center[&#34;length&#34;].cumsum()
+        # delta time
+        dt = center.index[1:] - center.index[:-1]
+        # convert nsdeltatime to seconds
+        dt = dt.to_numpy().astype(float) / 1e9
+        center[&#34;speed&#34;] = np.nan
+        center[&#34;speed&#34;].iloc[1:] = center[&#34;length&#34;].iloc[1:] / dt
+        self.locomotion_data = center
+        self.total_distance = center[&#34;length&#34;].sum()
+        self.mean_speed = center[&#34;speed&#34;].mean()
+
+        for roi_obj in self.objects:
+            name = roi_obj.name
+            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+                filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
+            )
+            count = mask.sum()
+            roi_obj.data = {&#34;frame_count&#34;: count, &#34;duration&#34;: count / self.FPS}
+
+        self.filter_data = filter_data.copy()
+
+        # TODO
+        # this part is filter for ploting
+        # filter the climbing data
+        # select the nose is &lt; 4 cm and center  &gt; 4 cm
+        filter_func = lambda roi_obj: (
+            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
+            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+        )
+        # condition fit object A or object B
+        distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
+
+        filter_data = filter_data[distance_mask]
+
+        self.climbing_filter = filter_data.copy()
+
+    def __plot_objects(self, ax):
+        ax.scatter(
+            self.object_a.x * self.scale_x,
+            self.object_a.y * self.scale_y,
+            s=600,
+            c=&#34;#ff2251&#34;,
+            alpha=0.5,
+        )
+
+        ax.scatter(
+            self.object_b.x * self.scale_x,
+            self.object_b.y * self.scale_y,
+            s=600,
+            c=&#34;#00b48c&#34;,
+            alpha=0.5,
+        )
+
+    def plot_trajectory(self):
+        nose = self.filter_data.nose
+        center = self.filter_data.center
+
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        ax.plot(nose.x.values, nose.y.values, alpha=0.75)
+        ax.plot(center.x.values, center.y.values, alpha=0.75)
+        self.__plot_objects(ax)
+        ax.set_ylim(40, 0)
+        ax.set_xlim(0, 40)
+        # fig.set_title(f&#34;file: {self.csv_path.stem}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_scatter.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    def plot_filter_scatter(self):
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+
+        nose = self.climbing_filter.nose
+        center = self.climbing_filter.center
+        ax.scatter(nose.x.values, nose.y.values, alpha=0.4)
+        ax.scatter(center.x.values, center.y.values, alpha=0.4)
+        self.__plot_objects(ax)
+        ax.set_xlim(0, 40)
+        ax.set_ylim(40, 0)
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_filtered.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    def plot_heatmap(self):
+        from matplotlib import colors
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
+        nose_np_y = nose_np[:, 1]
+        nose_np_x = nose_np[:, 0]
+        # make histrogram2d
+        counts, y, x = np.histogram2d(
+            nose_np_y,
+            nose_np_x,
+            self.frame_dimensions,
+        )
+
+        # Filter by Gaussian_filter from scipy
+        counts = ndimage.gaussian_filter(counts, sigma=8)
+
+        # Heatmap with customized colormap
+        fig = plt.figure(figsize=(5, 5))
+
+        ax = fig.add_subplot(111)
+        norm = colors.LogNorm(vmin=np.nanmin(counts), vmax=np.nanmax(counts))
+        cmap = colors.LinearSegmentedColormap.from_list(
+            &#34;custom&#34;,
+            [&#34;grey&#34;, &#34;#edf8e9&#34;, &#34;#74c476&#34;, &#34;#006d2c&#34;],
+            N=64,
+        )
+        # colmap = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+        im = ax.imshow(counts, cmap=cmap)
+        # create an axes on the right side of ax. The width of cax will be 5%
+        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+        fig.colorbar(im, cax=cax)
+
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_heatmap.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    @property
+    def summary_df(self) -&gt; pd.DataFrame:
+        z1 = self.object_a.data[&#34;frame_count&#34;]
+        z2 = self.object_b.data[&#34;frame_count&#34;]
+        total = z1 + z2
+        return pd.DataFrame.from_dict(
+            OrderedDict(
+                filename=[self.csv_path.stem],
+                FrameNumber_exploration_Zone1=[z1],
+                FrameNumber_exploration_Zone2=[z2],
+                video_fps=[self.FPS],
+                Time_exploration_Zone1=[self.object_a.data[&#34;duration&#34;]],
+                Time_exploration_Zone2=[self.object_b.data[&#34;duration&#34;]],
+                Zone1_x=[self.object_a.x * self.scale_x],
+                Zone1_y=[self.object_a.y * self.scale_y],
+                Zone2_x=[self.object_a.x * self.scale_x],
+                Zone2_y=[self.object_a.y * self.scale_y],
+                Zone1_coord=[(self.object_a.x, self.object_a.y)],
+                Zone2_coord=[(self.object_b.x, self.object_b.y)],
+                video_shape_w=[self.frame_dimensions[0]],
+                video_shape_h=[self.frame_dimensions[0]],
+                Discrimination_index_Zone1_to_Zone2=[(z1 - z2) / total],
+                Discrimination_index_Zone2_to_Zone1=[(z2 - z1) / total],
+                total_distance=[self.total_distance],
+                mean_speed=[self.mean_speed],
+            )
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.climbing_filter"><code class="name">var <span class="ident">climbing_filter</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.data"><code class="name">var <span class="ident">data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.filter_data"><code class="name">var <span class="ident">filter_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.locomotion_data"><code class="name">var <span class="ident">locomotion_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.mean_speed"><code class="name">var <span class="ident">mean_speed</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.nose2obj"><code class="name">var <span class="ident">nose2obj</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.objects"><code class="name">var <span class="ident">objects</span> : List[<a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.offset"><code class="name">var <span class="ident">offset</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.raw_data"><code class="name">var <span class="ident">raw_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.scale_x"><code class="name">var <span class="ident">scale_x</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.scale_y"><code class="name">var <span class="ident">scale_y</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.total_distance"><code class="name">var <span class="ident">total_distance</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.num_of_objects"><code class="name">var <span class="ident">num_of_objects</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def num_of_objects(self) -&gt; int:
+    return len(self.objects)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.object_a"><code class="name">var <span class="ident">object_a</span> : <a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def object_a(self) -&gt; Roi:
+    for o in self.objects:
+        if o.name.lower().endswith(&#34;a&#34;):
+            return o
+    raise AttributeError()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.object_b"><code class="name">var <span class="ident">object_b</span> : <a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def object_b(self) -&gt; Roi:
+    for o in self.objects:
+        if o.name.lower().endswith(&#34;b&#34;):
+            return o
+    raise AttributeError()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.summary_df"><code class="name">var <span class="ident">summary_df</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def summary_df(self) -&gt; pd.DataFrame:
+    z1 = self.object_a.data[&#34;frame_count&#34;]
+    z2 = self.object_b.data[&#34;frame_count&#34;]
+    total = z1 + z2
+    return pd.DataFrame.from_dict(
+        OrderedDict(
+            filename=[self.csv_path.stem],
+            FrameNumber_exploration_Zone1=[z1],
+            FrameNumber_exploration_Zone2=[z2],
+            video_fps=[self.FPS],
+            Time_exploration_Zone1=[self.object_a.data[&#34;duration&#34;]],
+            Time_exploration_Zone2=[self.object_b.data[&#34;duration&#34;]],
+            Zone1_x=[self.object_a.x * self.scale_x],
+            Zone1_y=[self.object_a.y * self.scale_y],
+            Zone2_x=[self.object_a.x * self.scale_x],
+            Zone2_y=[self.object_a.y * self.scale_y],
+            Zone1_coord=[(self.object_a.x, self.object_a.y)],
+            Zone2_coord=[(self.object_b.x, self.object_b.y)],
+            video_shape_w=[self.frame_dimensions[0]],
+            video_shape_h=[self.frame_dimensions[0]],
+            Discrimination_index_Zone1_to_Zone2=[(z1 - z2) / total],
+            Discrimination_index_Zone2_to_Zone1=[(z2 - z1) / total],
+            total_distance=[self.total_distance],
+            mean_speed=[self.mean_speed],
+        )
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.add_object"><code class="name flex">
+<span>def <span class="ident">add_object</span></span>(<span>self, obj: <a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Roi object manually.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj</code></strong> :&ensp;<code><a title="pyDLCbehavior.Roi" href="#pyDLCbehavior.Roi">Roi</a></code></dt>
+<dd>A Roi instance contains (x,y, width, height, name)</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>Raise error if input is not Roi instance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_object(self, obj: Roi) -&gt; None:
+    &#34;&#34;&#34;Add a Roi object manually.
+
+    Args:
+        obj (Roi): A Roi instance contains (x,y, width, height, name)
+
+    Raises:
+        TypeError: Raise error if input is not Roi instance
+    &#34;&#34;&#34;
+    if not isinstance(obj, Roi):
+        raise TypeError(&#34;obj should be Roi instance&#34;)
+    self.objects.append(obj)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.analyze"><code class="name flex">
+<span>def <span class="ident">analyze</span></span>(<span>self, nose2obj: int = 4, offset: int = 15) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+    if self.num_of_objects == 0:
+        print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
+        return
+
+    self.nose2obj = self.nose2obj or nose2obj
+    self.offset = self.offset or offset
+    # copy the data from raw_data
+    data = self.raw_data.copy()
+
+    # a convinient index for slice the multi-index
+    idx = pd.IndexSlice
+
+    # get body parts
+    part_names = data.columns.get_level_values(0).unique()
+    object_names = [c for c in part_names if &#34;obj&#34; in c.lower()]
+    bodyparts = [c for c in part_names if &#34;obj&#34; not in c.lower()]
+
+    # temp class that decide the distance to ROI and predict coordinates
+    from collections import namedtuple
+
+    Coords = namedtuple(&#34;Coords&#34;, [&#34;name&#34;, &#34;coords&#34;])
+    get_coord = lambda o: Coords(o, (data[o, &#34;x&#34;].mean(), data[o, &#34;y&#34;].mean()))
+    # list of Coords(name = name, coords = (x, y))
+    dlc_objs = [get_coord(o) for o in object_names]
+
+    for roi_obj in self.objects:
+        # automatic assign the object name by distance
+        name = min(dlc_objs, key=lambda x: roi_obj.distance(*x.coords)).name
+        if not roi_obj.name:
+            roi_obj.name = f&#34;ROI_{name}&#34;
+        data.loc[:, (roi_obj.name, &#34;x&#34;)] = roi_obj.x
+        data.loc[:, (roi_obj.name, &#34;y&#34;)] = roi_obj.y
+
+    part_names = data.columns.get_level_values(0).unique()
+    # object real distance (cm)
+    real_x_cm, real_y_cm = 20, 20
+    scale_x = real_x_cm / abs(self.objects[0].x - self.objects[1].x)
+    scale_y = real_y_cm / abs(self.objects[0].y - self.objects[1].y)
+    self.scale_x, self.scale_y = scale_x, scale_y
+    # scale all coordinates to real distance (cm)
+    data.loc[:, idx[:, &#34;x&#34;]] = data.loc[:, idx[:, &#34;x&#34;]] * scale_x
+    data.loc[:, idx[:, &#34;y&#34;]] = data.loc[:, idx[:, &#34;y&#34;]] * scale_y
+
+    # Get the distance between each bodypart and object
+    for roi_obj in self.objects:
+        # create the new column names for assign the distance
+        new_cols = pd.MultiIndex.from_tuples(
+            [(b, f&#34;distance_to_{roi_obj.name}&#34;) for b in bodyparts],
+            names=[&#34;bodyparts&#34;, &#34;coords&#34;],
+        )
+        scale_obj_x = roi_obj.x * scale_x
+        scale_obj_y = roi_obj.y * scale_y
+        data[new_cols] = np.sqrt(
+            np.square(data.loc[:, idx[bodyparts, &#34;x&#34;]].values - scale_obj_x)
+            + np.square(data.loc[:, idx[bodyparts, &#34;y&#34;]].values - scale_obj_y)
+        )
+    data = data[part_names]
+
+    # calculate the distance from nose to center
+    data[&#34;nose2center&#34;] = np.sqrt(
+        np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;x&#34;]]))
+        + np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;y&#34;]]))
+    )
+    self.data = data
+
+    # first filter all data by 15cm
+    # offset default is 15 cm
+    filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+
+    # took the center position
+    center = (
+        filter_data.loc[:, idx[&#34;center&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+    )
+    center[&#34;length&#34;] = np.sqrt(np.square(center.diff()).sum(axis=1))
+    center[&#34;distance&#34;] = center[&#34;length&#34;].cumsum()
+    # delta time
+    dt = center.index[1:] - center.index[:-1]
+    # convert nsdeltatime to seconds
+    dt = dt.to_numpy().astype(float) / 1e9
+    center[&#34;speed&#34;] = np.nan
+    center[&#34;speed&#34;].iloc[1:] = center[&#34;length&#34;].iloc[1:] / dt
+    self.locomotion_data = center
+    self.total_distance = center[&#34;length&#34;].sum()
+    self.mean_speed = center[&#34;speed&#34;].mean()
+
+    for roi_obj in self.objects:
+        name = roi_obj.name
+        mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+            filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
+        )
+        count = mask.sum()
+        roi_obj.data = {&#34;frame_count&#34;: count, &#34;duration&#34;: count / self.FPS}
+
+    self.filter_data = filter_data.copy()
+
+    # TODO
+    # this part is filter for ploting
+    # filter the climbing data
+    # select the nose is &lt; 4 cm and center  &gt; 4 cm
+    filter_func = lambda roi_obj: (
+        (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
+        &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+    )
+    # condition fit object A or object B
+    distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
+
+    filter_data = filter_data[distance_mask]
+
+    self.climbing_filter = filter_data.copy()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_filter_scatter"><code class="name flex">
+<span>def <span class="ident">plot_filter_scatter</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_filter_scatter(self):
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111)
+
+    nose = self.climbing_filter.nose
+    center = self.climbing_filter.center
+    ax.scatter(nose.x.values, nose.y.values, alpha=0.4)
+    ax.scatter(center.x.values, center.y.values, alpha=0.4)
+    self.__plot_objects(ax)
+    ax.set_xlim(0, 40)
+    ax.set_ylim(40, 0)
+    fig.tight_layout()
+    fig.savefig(
+        self.homedir.joinpath(f&#34;{self.csv_path.stem}_filtered.png&#34;),
+        transparent=True,
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_heatmap"><code class="name flex">
+<span>def <span class="ident">plot_heatmap</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_heatmap(self):
+    from matplotlib import colors
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
+    nose_np_y = nose_np[:, 1]
+    nose_np_x = nose_np[:, 0]
+    # make histrogram2d
+    counts, y, x = np.histogram2d(
+        nose_np_y,
+        nose_np_x,
+        self.frame_dimensions,
+    )
+
+    # Filter by Gaussian_filter from scipy
+    counts = ndimage.gaussian_filter(counts, sigma=8)
+
+    # Heatmap with customized colormap
+    fig = plt.figure(figsize=(5, 5))
+
+    ax = fig.add_subplot(111)
+    norm = colors.LogNorm(vmin=np.nanmin(counts), vmax=np.nanmax(counts))
+    cmap = colors.LinearSegmentedColormap.from_list(
+        &#34;custom&#34;,
+        [&#34;grey&#34;, &#34;#edf8e9&#34;, &#34;#74c476&#34;, &#34;#006d2c&#34;],
+        N=64,
+    )
+    # colmap = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+    im = ax.imshow(counts, cmap=cmap)
+    # create an axes on the right side of ax. The width of cax will be 5%
+    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+    fig.colorbar(im, cax=cax)
+
+    fig.tight_layout()
+    fig.savefig(
+        self.homedir.joinpath(f&#34;{self.csv_path.stem}_heatmap.png&#34;),
+        transparent=True,
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_trajectory"><code class="name flex">
+<span>def <span class="ident">plot_trajectory</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_trajectory(self):
+    nose = self.filter_data.nose
+    center = self.filter_data.center
+
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111)
+    ax.plot(nose.x.values, nose.y.values, alpha=0.75)
+    ax.plot(center.x.values, center.y.values, alpha=0.75)
+    self.__plot_objects(ax)
+    ax.set_ylim(40, 0)
+    ax.set_xlim(0, 40)
+    # fig.set_title(f&#34;file: {self.csv_path.stem}&#34;)
+    fig.tight_layout()
+    fig.savefig(
+        self.homedir.joinpath(f&#34;{self.csv_path.stem}_scatter.png&#34;),
+        transparent=True,
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.preprocess"><code class="name flex">
+<span>def <span class="ident">preprocess</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>filter the raw data by moving averaging</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess(self) -&gt; None:
+    &#34;&#34;&#34;filter the raw data by moving averaging&#34;&#34;&#34;
+    # drop the scorer columns
+    raw = self.raw_data.droplevel(0, axis=1)
+
+    # Rolling the data by 5 seconds to get the reliable start time.
+    # Using nose as target to calculate the rolling mean of likelihood
+    # Get the index when mean of likelihood is larger than 0.99
+    # default is the first items
+    all_joints_names = self.dlc_model_config[&#34;all_joints_names&#34;]
+    bodypart = all_joints_names[0]
+    if &#34;nose&#34; in all_joints_names:
+        bodypart = &#34;nose&#34;
+    elif &#34;center&#34; in all_joints_names:
+        bodypart = &#34;center&#34;
+
+    rolling_window = &#34;5s&#34;
+    df_MVA = raw[bodypart, &#34;likelihood&#34;].rolling(rolling_window).mean()
+    start = df_MVA[df_MVA &gt; 0.99].index.min()
+    # Time window for 10 minutes
+    end = start + timedelta(minutes=10)
+    raw = raw[start:end]
+    # set data to class instance
+    self.raw_data = raw</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.NovelObjectRecognitionAnalysis.select_objects"><code class="name flex">
+<span>def <span class="ident">select_objects</span></span>(<span>self, num_of_objects: int = 2) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>select the roi object manually.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>num_of_objects</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>How many object to be selected. Defaults to 2.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select_objects(self, num_of_objects: int = 2) -&gt; None:
+    &#34;&#34;&#34;select the roi object manually.
+
+    Args:
+        num_of_objects (int, optional): How many object to be selected. Defaults to 2.
+    &#34;&#34;&#34;
+    self.objects = setrois(self.video_path, num_of_objects)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pyDLCbehavior.dataset.DLCDataset.load_csv" href="dataset.html#pyDLCbehavior.dataset.DLCDataset.load_csv">load_csv</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="pyDLCbehavior.Roi"><code class="flex name class">
+<span>class <span class="ident">Roi</span></span>
+<span>(</span><span>order: int = -1, x: int = -1, y: int = -1, width: int = -1, height: int = -1, name: str = '')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A basic class that store the region of interests in pixel value</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Roi:
+    &#34;&#34;&#34;A basic class that store the region of interests in pixel value&#34;&#34;&#34;
+
+    order: int = -1
+    x: int = -1
+    y: int = -1
+    width: int = -1
+    height: int = -1
+    name: str = &#34;&#34;
+    # save the data from NorDlcAnalysis
+    data: Dict = field(init=False, default_factory=dict)
+
+    def to_dict(self) -&gt; OrderedDict[str, int]:
+        &#34;&#34;&#34;Get the dict of all attributes
+
+        Returns:
+            OrderDict[str, int]: dict of parameters
+        &#34;&#34;&#34;
+        return OrderedDict(
+            order=self.order,
+            x=self.x,
+            y=self.y,
+            width=self.width,
+            height=self.height,
+            name=self.name,
+            data=self.data,
+        )
+
+    def __setstate__(self, d: Mapping[str, int]) -&gt; None:
+        &#34;&#34;&#34;A function that called when unpickling the Roi class
+
+        Args:
+            d (Mapping[str, int]): data to be unpickled
+        &#34;&#34;&#34;
+        self.__dict__.update(d)
+
+    def __getstate__(self) -&gt; Mapping[str, int]:
+        &#34;&#34;&#34;Called when pickleind the Roi
+
+        Returns:
+            Mapping[str, int]: dict to be pickled
+        &#34;&#34;&#34;
+        return self.to_dict()
+
+    def to_json_str(self) -&gt; str:
+        &#34;&#34;&#34;Get the json serialized string
+
+        Returns:
+            str: json serialized string
+        &#34;&#34;&#34;
+        import json
+
+        return json.dumps(self.to_dict())
+
+    def draw(self, src: ndarray) -&gt; ndarray:
+        &#34;&#34;&#34;Draw the ROI rectangle and label on the source image
+
+        Args:
+            src (ndarray): source image to be draw (8U_C1, 8U_C3)
+
+        Returns:
+            ndarray: labeled image
+        &#34;&#34;&#34;
+        if not isinstance(src, ndarray):
+            raise TypeError(&#34;src is not a ndarray&#34;)
+        color = (0, 255, 255)
+        pt1 = (self.x, self.y)
+        pt2 = (self.x + self.width, self.y + self.height)
+        cv2.putText(
+            src,
+            f&#34;Roi{self.order}&#34;,
+            (self.x, self.y - 3),
+            cv2.FONT_HERSHEY_DUPLEX,
+            0.7,
+            color,
+            thickness=2,
+        )
+        return cv2.rectangle(src, pt1, pt2, color, thickness=2)
+
+    def distance(self, x: int, y: int) -&gt; int:
+        &#34;&#34;&#34;Calculate the euclidean distance of x, y coordinate to Roi (pixel-wise)
+
+        Args:
+            x (int): x coordinate (pixel position)
+            y (int): y coordinate (pixel position)
+
+        Returns:
+            int: the euclidean distance
+        &#34;&#34;&#34;
+        from math import floor, pow, sqrt
+
+        return floor(sqrt(pow(self.x - x, 2) + pow(self.y - y, 2)))</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.Roi.data"><code class="name">var <span class="ident">data</span> : Dict</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.Roi.height"><code class="name">var <span class="ident">height</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.Roi.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.Roi.order"><code class="name">var <span class="ident">order</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.Roi.width"><code class="name">var <span class="ident">width</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.Roi.x"><code class="name">var <span class="ident">x</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.Roi.y"><code class="name">var <span class="ident">y</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.Roi.distance"><code class="name flex">
+<span>def <span class="ident">distance</span></span>(<span>self, x: int, y: int) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the euclidean distance of x, y coordinate to Roi (pixel-wise)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>int</code></dt>
+<dd>x coordinate (pixel position)</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>int</code></dt>
+<dd>y coordinate (pixel position)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>the euclidean distance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def distance(self, x: int, y: int) -&gt; int:
+    &#34;&#34;&#34;Calculate the euclidean distance of x, y coordinate to Roi (pixel-wise)
+
+    Args:
+        x (int): x coordinate (pixel position)
+        y (int): y coordinate (pixel position)
+
+    Returns:
+        int: the euclidean distance
+    &#34;&#34;&#34;
+    from math import floor, pow, sqrt
+
+    return floor(sqrt(pow(self.x - x, 2) + pow(self.y - y, 2)))</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.Roi.draw"><code class="name flex">
+<span>def <span class="ident">draw</span></span>(<span>self, src: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Draw the ROI rectangle and label on the source image</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>src</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>source image to be draw (8U_C1, 8U_C3)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>labeled image</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw(self, src: ndarray) -&gt; ndarray:
+    &#34;&#34;&#34;Draw the ROI rectangle and label on the source image
+
+    Args:
+        src (ndarray): source image to be draw (8U_C1, 8U_C3)
+
+    Returns:
+        ndarray: labeled image
+    &#34;&#34;&#34;
+    if not isinstance(src, ndarray):
+        raise TypeError(&#34;src is not a ndarray&#34;)
+    color = (0, 255, 255)
+    pt1 = (self.x, self.y)
+    pt2 = (self.x + self.width, self.y + self.height)
+    cv2.putText(
+        src,
+        f&#34;Roi{self.order}&#34;,
+        (self.x, self.y - 3),
+        cv2.FONT_HERSHEY_DUPLEX,
+        0.7,
+        color,
+        thickness=2,
+    )
+    return cv2.rectangle(src, pt1, pt2, color, thickness=2)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.Roi.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> OrderedDict[str, int]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the dict of all attributes</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>OrderDict[str, int]</code></dt>
+<dd>dict of parameters</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; OrderedDict[str, int]:
+    &#34;&#34;&#34;Get the dict of all attributes
+
+    Returns:
+        OrderDict[str, int]: dict of parameters
+    &#34;&#34;&#34;
+    return OrderedDict(
+        order=self.order,
+        x=self.x,
+        y=self.y,
+        width=self.width,
+        height=self.height,
+        name=self.name,
+        data=self.data,
+    )</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.Roi.to_json_str"><code class="name flex">
+<span>def <span class="ident">to_json_str</span></span>(<span>self) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the json serialized string</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>json serialized string</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json_str(self) -&gt; str:
+    &#34;&#34;&#34;Get the json serialized string
+
+    Returns:
+        str: json serialized string
+    &#34;&#34;&#34;
+    import json
+
+    return json.dumps(self.to_dict())</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis"><code class="flex name class">
+<span>class <span class="ident">YMazeAnalysis</span></span>
+<span>(</span><span>csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '', time: int = 8)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>YMazeAnalysis(csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '', time: int = 8)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class YMazeAnalysis(DLCDataset):
+    # analysis time window
+    time: int = 8
+    savedir: Path = field(init=False)
+
+    # scale parameters
+    scale_x: float = field(init=False, default=1)
+    scale_y: float = field(init=False, default=1)
+
+    # data after analysis
+    labeled_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    arms: ArmCollection = field(init=False, default_factory=ArmCollection)
+    ymaze_center: np.ndarray = field(init=False, repr=False, default=None)
+    alternation_data: Dict[str, Any] = field(
+        init=False, repr=False, default_factory=dict
+    )
+
+    # the summary from center trajectory
+    locomotion_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    total_distance: float = field(init=False, default=None)
+    mean_speed: float = field(init=False, default=None)
+
+    def __post_init__(self) -&gt; None:
+        super().__post_init__()
+        self.savedir = self.homedir.joinpath(&#34;save&#34;, f&#34;{self.time}min&#34;)
+        if not self.savedir.exists():
+            self.savedir.mkdir(parents=True)
+        self.preprocess()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        super().__setstate__(d)
+        self.savedir = self.homedir.joinpath(&#34;save&#34;, f&#34;{self.time}min&#34;)
+        self.analyze()
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        d = super().__getstate__()
+        d.update({&#34;time&#34;: self.time, &#34;arms&#34;: self.arms})
+        return d
+
+    def preprocess(self) -&gt; None:
+        raw = self.raw_data.droplevel(0, axis=1)
+        # Rolling the data by 5 seconds to get the reliable start time.
+        # Using nose as target to calculate the rolling mean of likelihood
+        # Get the index when mean of likelihood is larger than 0.99
+        # default is the first items
+        rolling_window = &#34;3s&#34;
+        nose_MVA = raw[&#34;Nose&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        withers_MVA = raw[&#34;Withers&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        start = raw[(nose_MVA &gt; 0.95) &amp; (withers_MVA &gt; 0.95)].index.min()
+        # Time window for 8 minutes
+        end = start + timedelta(minutes=self.time)
+        raw = raw[start:end]
+        # set filter data to raw_data
+        self.raw_data = raw
+
+    def analyze(self):
+        # copy data
+        data = self.raw_data.copy()
+        # index slice
+        idx = pd.IndexSlice
+
+        # filter the data by distance from nose to withers
+        nose2wither = np.sqrt(
+            np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;x&#34;]]))
+            + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
+        )
+        data = data[nose2wither &lt; np.square(100)]
+
+        arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
+        ref_pt = []
+        #temp_arms = ArmCollection()
+        for a in arm_tags:
+            name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
+            mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
+            xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
+            arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+            ref_pt.append(arm_center)
+
+        # fit the abstract arm by DeepLabCut coordinates
+        arms: ArmCollection = BasicYMazeCollection()
+        arms.fit(ref_pt)
+
+        # mean pos_x, pos_y
+        middle_body_pos = (data.Nose[[&#34;x&#34;, &#34;y&#34;]] + data.Withers[[&#34;x&#34;, &#34;y&#34;]]) / 2
+
+        data[&#34;mask&#34;] = &#34;undefined&#34;
+        for arm in arms.values():
+            mask = middle_body_pos.apply(lambda pt: arm.contains(pt.x, pt.y), axis=1)
+            data.loc[mask, &#34;mask&#34;] = arm.name
+
+        ymaze_center = arms.center
+        calc_dist2center = lambda pt: np.square(pt - ymaze_center).sum() &lt; np.square(
+            100
+        )
+        mask = middle_body_pos.apply(calc_dist2center, axis=1, raw=True)
+        data.loc[mask, &#34;mask&#34;] = &#34;o&#34;
+
+        ###################################################
+        # Get the property of locomotor activity.
+        # Length x between center and mean point of arm1 and 2 is around 40 cm * sqrt(3) / 2
+        # Lenght y between center and mean point of arm1 and 2 is around 40 cm * 1 / 2
+        # Total distance is calculated following ARIMA model (moving average)
+        ###################################################
+
+        xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
+
+        scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
+        
+        withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+
+        # Set the rolling time window as 5
+        rolling_window = &#34;5s&#34;
+        withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
+        
+        scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
+        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        self.scale_x = abs(pt1[0] - pt2[0])
+        self.scale_y = abs(pt1[1] - pt2[1])
+
+        withers[[&#34;x&#34;, &#34;y&#34;]] = scaler.scale(withers.values)
+        # withers[&#34;x&#34;] = withers[&#34;x&#34;] * scale_x
+        # withers[&#34;y&#34;] = withers[&#34;y&#34;] * scale_y
+
+        withers[&#34;length&#34;] = np.sqrt(np.square(withers.diff()).sum(axis=1))
+        withers[&#34;distance&#34;] = withers[&#34;length&#34;].cumsum()
+        # delta time
+        dt = withers.index[1:] - withers.index[:-1]
+        # convert nsdeltatime to seconds
+        dt = dt.to_numpy().astype(float) / 1e9
+        withers[&#34;speed&#34;] = np.nan
+        withers[&#34;speed&#34;].iloc[1:] = withers[&#34;length&#34;].iloc[1:] / dt
+
+        self.locomotion_data = withers
+        self.total_distance = withers[&#34;length&#34;].sum()
+        self.mean_speed = withers[&#34;speed&#34;].mean()
+
+        self.ymaze_center = ymaze_center
+        self.arms = arms
+        self.labeled_data = data
+
+        # analysis the alternation
+        self.analyze_alternation()
+
+    def analyze_alternation(self):
+        data = self.labeled_data
+        labels = data[&#34;mask&#34;].copy()
+        start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+        labels = labels.loc[start:]
+        labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+        labels = labels.ffill()
+        labels.index.name = &#34;time&#34;
+        onset = (
+            labels[labels != labels.shift(1)]
+            .reset_index()
+            .rename(columns={&#34;mask&#34;: &#34;onset&#34;, &#34;time&#34;: &#34;onset_time&#34;})
+        )
+        offset = (
+            labels[labels != labels.shift(-1)]
+            .reset_index()
+            .rename(columns={&#34;mask&#34;: &#34;offset&#34;, &#34;time&#34;: &#34;offset_time&#34;})
+        )
+
+        alt_df = pd.concat([onset, offset], axis=1)
+        alt_df[&#34;duration&#34;] = alt_df[&#34;offset_time&#34;] - alt_df[&#34;onset_time&#34;]
+        total_row = len(alt_df)
+        num_of_arms = (alt_df.onset != &#34;o&#34;).sum()
+        #### Fetch the alternation, which is the count of arm entries that a mouse does not entry in the same arm over 3 entries.
+        #### Compared to next 2 entries.
+        arm_label = alt_df[alt_df.onset != &#34;o&#34;].onset
+
+        alt_mask = (
+            (arm_label != arm_label.shift(-1))
+            &amp; (arm_label != arm_label.shift(-2))
+            &amp; (arm_label.shift(-1) != arm_label.shift(-2))
+        )
+        alt = alt_mask.sum()
+        # Alternation ratio calculation
+        alternation_ratio = alt / (num_of_arms - 2) * 100
+        alternation_ratio = np.round(alternation_ratio, 3)
+
+        # Store each varibale in alt_dict
+        alternation_data = {
+            &#34;spontaneous_alternation&#34;: alt,  # Spontaneous_alternation
+            &#34;alternation_ratio&#34;: alternation_ratio,  # Alternation_ratio
+            &#34;arm_entries&#34;: num_of_arms,  # Arm_entries
+            &#34;alternation_order&#34;: alt_df,
+        }
+        self.alternation_data = alternation_data
+
+    def plot_ymaze(self) -&gt; mpl.figure.Figure:
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        data = self.labeled_data
+        withers = data[&#34;Withers&#34;]
+        ax.plot(withers.x, withers.y, alpha=0.2)
+
+        import re
+        from itertools import cycle
+
+        colors = str(plt.rcParams[&#34;axes.prop_cycle&#34;])
+        colors = cycle(
+            map(lambda s: s.strip(&#34; &#39;&#34;), re.findall(r&#34;&#39;#.*&#39;&#34;, colors)[0].split(&#34;,&#34;))
+        )
+        [next(colors) for _ in range(2)]
+
+        for arm, c in zip(self.arms.values(), colors):
+            ax.text(*arm.center, arm.name, size=12)
+            arm.draw_area(ax, facecolor=c + &#34;70&#34;, zorder=2)
+        ax.scatter(*self.ymaze_center, c=&#34;red&#34;)
+
+        for label in [&#34;o&#34;, &#34;A&#34;, &#34;B&#34;, &#34;C&#34;]:
+            filter_withers = data.loc[data[&#34;mask&#34;] == label, &#34;Withers&#34;]
+            ax.plot(filter_withers.x, filter_withers.y)
+
+        self.arms.draw_contour(ax, facecolor=&#34;0.9&#34;, edgecolor=&#34;0.5&#34;)
+
+        width, height = self.frame_dimensions
+        ax.set_xlim(0, width)
+        ax.set_ylim(height, 0)
+        filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+        ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.savedir.joinpath(f&#34;{filename}_Ymaze_apperance_{self.time}.png&#34;)
+        )
+        return fig
+
+    def plot_alternations(self) -&gt; mpl.figure.Figure:
+        data = self.labeled_data
+        labels = data[&#34;mask&#34;].copy()
+        start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+        labels = labels.loc[start:]
+        labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+        labels = labels.ffill()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        from collections import defaultdict
+
+        dic = defaultdict(lambda: 5, A=1, B=2, C=3, o=4)
+
+        label_nums = labels.replace(dic)
+        ax.plot(label_nums)
+        ax.plot(label_nums.diff())
+        # set labels
+        group_labels = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;Center&#34;, &#34;Others&#34;]
+        ax.set_yticks([1, 2, 3, 4, 5])
+        ax.set_yticklabels(group_labels)
+        ax.set_ylim(0, 6)
+        filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+        ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.savedir.joinpath(f&#34;{filename}_Ymaze_alternation_{self.time}min.png&#34;)
+        )
+        return fig
+
+    @property
+    def summary_df(self) -&gt; pd.DataFrame:
+        return pd.DataFrame.from_dict(
+            OrderedDict(
+                filename=[self.csv_path.stem],
+                video_shape=[self.frame_dimensions],
+                video_fps=[self.FPS],
+                arm_entries=[self.alternation_data[&#34;arm_entries&#34;]],
+                spontaneous_alternation=[
+                    self.alternation_data[&#34;spontaneous_alternation&#34;]
+                ],
+                total_distance=[self.total_distance],
+                mean_speed=[self.mean_speed],
+            )
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.YMazeAnalysis.alternation_data"><code class="name">var <span class="ident">alternation_data</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.arms"><code class="name">var <span class="ident">arms</span> : <a title="pyDLCbehavior.ymaze.ArmCollection" href="ymaze.html#pyDLCbehavior.ymaze.ArmCollection">ArmCollection</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.labeled_data"><code class="name">var <span class="ident">labeled_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.locomotion_data"><code class="name">var <span class="ident">locomotion_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.mean_speed"><code class="name">var <span class="ident">mean_speed</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.savedir"><code class="name">var <span class="ident">savedir</span> : pathlib.Path</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.scale_x"><code class="name">var <span class="ident">scale_x</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.scale_y"><code class="name">var <span class="ident">scale_y</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.time"><code class="name">var <span class="ident">time</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.total_distance"><code class="name">var <span class="ident">total_distance</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.ymaze_center"><code class="name">var <span class="ident">ymaze_center</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyDLCbehavior.YMazeAnalysis.summary_df"><code class="name">var <span class="ident">summary_df</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def summary_df(self) -&gt; pd.DataFrame:
+    return pd.DataFrame.from_dict(
+        OrderedDict(
+            filename=[self.csv_path.stem],
+            video_shape=[self.frame_dimensions],
+            video_fps=[self.FPS],
+            arm_entries=[self.alternation_data[&#34;arm_entries&#34;]],
+            spontaneous_alternation=[
+                self.alternation_data[&#34;spontaneous_alternation&#34;]
+            ],
+            total_distance=[self.total_distance],
+            mean_speed=[self.mean_speed],
+        )
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.YMazeAnalysis.analyze"><code class="name flex">
+<span>def <span class="ident">analyze</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze(self):
+    # copy data
+    data = self.raw_data.copy()
+    # index slice
+    idx = pd.IndexSlice
+
+    # filter the data by distance from nose to withers
+    nose2wither = np.sqrt(
+        np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;x&#34;]]))
+        + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
+    )
+    data = data[nose2wither &lt; np.square(100)]
+
+    arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
+    ref_pt = []
+    #temp_arms = ArmCollection()
+    for a in arm_tags:
+        name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
+        mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
+        xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
+        arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+        ref_pt.append(arm_center)
+
+    # fit the abstract arm by DeepLabCut coordinates
+    arms: ArmCollection = BasicYMazeCollection()
+    arms.fit(ref_pt)
+
+    # mean pos_x, pos_y
+    middle_body_pos = (data.Nose[[&#34;x&#34;, &#34;y&#34;]] + data.Withers[[&#34;x&#34;, &#34;y&#34;]]) / 2
+
+    data[&#34;mask&#34;] = &#34;undefined&#34;
+    for arm in arms.values():
+        mask = middle_body_pos.apply(lambda pt: arm.contains(pt.x, pt.y), axis=1)
+        data.loc[mask, &#34;mask&#34;] = arm.name
+
+    ymaze_center = arms.center
+    calc_dist2center = lambda pt: np.square(pt - ymaze_center).sum() &lt; np.square(
+        100
+    )
+    mask = middle_body_pos.apply(calc_dist2center, axis=1, raw=True)
+    data.loc[mask, &#34;mask&#34;] = &#34;o&#34;
+
+    ###################################################
+    # Get the property of locomotor activity.
+    # Length x between center and mean point of arm1 and 2 is around 40 cm * sqrt(3) / 2
+    # Lenght y between center and mean point of arm1 and 2 is around 40 cm * 1 / 2
+    # Total distance is calculated following ARIMA model (moving average)
+    ###################################################
+
+    xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
+
+    scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
+    
+    withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+
+    # Set the rolling time window as 5
+    rolling_window = &#34;5s&#34;
+    withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
+    
+    scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
+    pt1, pt2 = scaler.scale([(1,1), (0,0)])
+    self.scale_x = abs(pt1[0] - pt2[0])
+    self.scale_y = abs(pt1[1] - pt2[1])
+
+    withers[[&#34;x&#34;, &#34;y&#34;]] = scaler.scale(withers.values)
+    # withers[&#34;x&#34;] = withers[&#34;x&#34;] * scale_x
+    # withers[&#34;y&#34;] = withers[&#34;y&#34;] * scale_y
+
+    withers[&#34;length&#34;] = np.sqrt(np.square(withers.diff()).sum(axis=1))
+    withers[&#34;distance&#34;] = withers[&#34;length&#34;].cumsum()
+    # delta time
+    dt = withers.index[1:] - withers.index[:-1]
+    # convert nsdeltatime to seconds
+    dt = dt.to_numpy().astype(float) / 1e9
+    withers[&#34;speed&#34;] = np.nan
+    withers[&#34;speed&#34;].iloc[1:] = withers[&#34;length&#34;].iloc[1:] / dt
+
+    self.locomotion_data = withers
+    self.total_distance = withers[&#34;length&#34;].sum()
+    self.mean_speed = withers[&#34;speed&#34;].mean()
+
+    self.ymaze_center = ymaze_center
+    self.arms = arms
+    self.labeled_data = data
+
+    # analysis the alternation
+    self.analyze_alternation()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.analyze_alternation"><code class="name flex">
+<span>def <span class="ident">analyze_alternation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze_alternation(self):
+    data = self.labeled_data
+    labels = data[&#34;mask&#34;].copy()
+    start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+    labels = labels.loc[start:]
+    labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+    labels = labels.ffill()
+    labels.index.name = &#34;time&#34;
+    onset = (
+        labels[labels != labels.shift(1)]
+        .reset_index()
+        .rename(columns={&#34;mask&#34;: &#34;onset&#34;, &#34;time&#34;: &#34;onset_time&#34;})
+    )
+    offset = (
+        labels[labels != labels.shift(-1)]
+        .reset_index()
+        .rename(columns={&#34;mask&#34;: &#34;offset&#34;, &#34;time&#34;: &#34;offset_time&#34;})
+    )
+
+    alt_df = pd.concat([onset, offset], axis=1)
+    alt_df[&#34;duration&#34;] = alt_df[&#34;offset_time&#34;] - alt_df[&#34;onset_time&#34;]
+    total_row = len(alt_df)
+    num_of_arms = (alt_df.onset != &#34;o&#34;).sum()
+    #### Fetch the alternation, which is the count of arm entries that a mouse does not entry in the same arm over 3 entries.
+    #### Compared to next 2 entries.
+    arm_label = alt_df[alt_df.onset != &#34;o&#34;].onset
+
+    alt_mask = (
+        (arm_label != arm_label.shift(-1))
+        &amp; (arm_label != arm_label.shift(-2))
+        &amp; (arm_label.shift(-1) != arm_label.shift(-2))
+    )
+    alt = alt_mask.sum()
+    # Alternation ratio calculation
+    alternation_ratio = alt / (num_of_arms - 2) * 100
+    alternation_ratio = np.round(alternation_ratio, 3)
+
+    # Store each varibale in alt_dict
+    alternation_data = {
+        &#34;spontaneous_alternation&#34;: alt,  # Spontaneous_alternation
+        &#34;alternation_ratio&#34;: alternation_ratio,  # Alternation_ratio
+        &#34;arm_entries&#34;: num_of_arms,  # Arm_entries
+        &#34;alternation_order&#34;: alt_df,
+    }
+    self.alternation_data = alternation_data</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.plot_alternations"><code class="name flex">
+<span>def <span class="ident">plot_alternations</span></span>(<span>self) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_alternations(self) -&gt; mpl.figure.Figure:
+    data = self.labeled_data
+    labels = data[&#34;mask&#34;].copy()
+    start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+    labels = labels.loc[start:]
+    labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+    labels = labels.ffill()
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    from collections import defaultdict
+
+    dic = defaultdict(lambda: 5, A=1, B=2, C=3, o=4)
+
+    label_nums = labels.replace(dic)
+    ax.plot(label_nums)
+    ax.plot(label_nums.diff())
+    # set labels
+    group_labels = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;Center&#34;, &#34;Others&#34;]
+    ax.set_yticks([1, 2, 3, 4, 5])
+    ax.set_yticklabels(group_labels)
+    ax.set_ylim(0, 6)
+    filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+    ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+    fig.tight_layout()
+    fig.savefig(
+        self.savedir.joinpath(f&#34;{filename}_Ymaze_alternation_{self.time}min.png&#34;)
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.plot_ymaze"><code class="name flex">
+<span>def <span class="ident">plot_ymaze</span></span>(<span>self) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_ymaze(self) -&gt; mpl.figure.Figure:
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111)
+    data = self.labeled_data
+    withers = data[&#34;Withers&#34;]
+    ax.plot(withers.x, withers.y, alpha=0.2)
+
+    import re
+    from itertools import cycle
+
+    colors = str(plt.rcParams[&#34;axes.prop_cycle&#34;])
+    colors = cycle(
+        map(lambda s: s.strip(&#34; &#39;&#34;), re.findall(r&#34;&#39;#.*&#39;&#34;, colors)[0].split(&#34;,&#34;))
+    )
+    [next(colors) for _ in range(2)]
+
+    for arm, c in zip(self.arms.values(), colors):
+        ax.text(*arm.center, arm.name, size=12)
+        arm.draw_area(ax, facecolor=c + &#34;70&#34;, zorder=2)
+    ax.scatter(*self.ymaze_center, c=&#34;red&#34;)
+
+    for label in [&#34;o&#34;, &#34;A&#34;, &#34;B&#34;, &#34;C&#34;]:
+        filter_withers = data.loc[data[&#34;mask&#34;] == label, &#34;Withers&#34;]
+        ax.plot(filter_withers.x, filter_withers.y)
+
+    self.arms.draw_contour(ax, facecolor=&#34;0.9&#34;, edgecolor=&#34;0.5&#34;)
+
+    width, height = self.frame_dimensions
+    ax.set_xlim(0, width)
+    ax.set_ylim(height, 0)
+    filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+    ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+    fig.tight_layout()
+    fig.savefig(
+        self.savedir.joinpath(f&#34;{filename}_Ymaze_apperance_{self.time}.png&#34;)
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.YMazeAnalysis.preprocess"><code class="name flex">
+<span>def <span class="ident">preprocess</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess(self) -&gt; None:
+    raw = self.raw_data.droplevel(0, axis=1)
+    # Rolling the data by 5 seconds to get the reliable start time.
+    # Using nose as target to calculate the rolling mean of likelihood
+    # Get the index when mean of likelihood is larger than 0.99
+    # default is the first items
+    rolling_window = &#34;3s&#34;
+    nose_MVA = raw[&#34;Nose&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+    withers_MVA = raw[&#34;Withers&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+    start = raw[(nose_MVA &gt; 0.95) &amp; (withers_MVA &gt; 0.95)].index.min()
+    # Time window for 8 minutes
+    end = start + timedelta(minutes=self.time)
+    raw = raw[start:end]
+    # set filter data to raw_data
+    self.raw_data = raw</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pyDLCbehavior.dataset.DLCDataset.load_csv" href="dataset.html#pyDLCbehavior.dataset.DLCDataset.load_csv">load_csv</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="pyDLCbehavior.YMazeScaler"><code class="flex name class">
+<span>class <span class="ident">YMazeScaler</span></span>
+<span>(</span><span>target: List[Tuple[int, int]])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>YMazeScaler(target: List[Tuple[int, int]])</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class YMazeScaler(PixelScaler):
+
+    reference: List[Tuple[int, int]] = field(init=False)
+
+    def __post_init__(self):
+        r = 35 + 6 / SQRT3
+        self.reference = np.array([P(r, 150), P(r, 270), P(r, 30)])
+        super().__post_init__()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.ymaze.PixelScaler" href="ymaze.html#pyDLCbehavior.ymaze.PixelScaler">PixelScaler</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.YMazeScaler.reference"><code class="name">var <span class="ident">reference</span> : List[Tuple[int, int]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pyDLCbehavior.ymaze.PixelScaler" href="ymaze.html#pyDLCbehavior.ymaze.PixelScaler">PixelScaler</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pyDLCbehavior.ymaze.PixelScaler.scale" href="ymaze.html#pyDLCbehavior.ymaze.PixelScaler.scale">scale</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -72,6 +2900,147 @@ from .dataset import DLCDataset</code></pre>
 <li><code><a title="pyDLCbehavior.dataset" href="dataset.html">pyDLCbehavior.dataset</a></code></li>
 <li><code><a title="pyDLCbehavior.utility" href="utility.html">pyDLCbehavior.utility</a></code></li>
 <li><code><a title="pyDLCbehavior.ymaze" href="ymaze.html">pyDLCbehavior.ymaze</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="pyDLCbehavior.glob_files" href="#pyDLCbehavior.glob_files">glob_files</a></code></li>
+<li><code><a title="pyDLCbehavior.setrois" href="#pyDLCbehavior.setrois">setrois</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pyDLCbehavior.ArmCollection" href="#pyDLCbehavior.ArmCollection">ArmCollection</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.ArmCollection.append" href="#pyDLCbehavior.ArmCollection.append">append</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.area" href="#pyDLCbehavior.ArmCollection.area">area</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.center" href="#pyDLCbehavior.ArmCollection.center">center</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.data" href="#pyDLCbehavior.ArmCollection.data">data</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.draw_contour" href="#pyDLCbehavior.ArmCollection.draw_contour">draw_contour</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.each_arm_center" href="#pyDLCbehavior.ArmCollection.each_arm_center">each_arm_center</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.get" href="#pyDLCbehavior.ArmCollection.get">get</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.items" href="#pyDLCbehavior.ArmCollection.items">items</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.keys" href="#pyDLCbehavior.ArmCollection.keys">keys</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.remove" href="#pyDLCbehavior.ArmCollection.remove">remove</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.sort" href="#pyDLCbehavior.ArmCollection.sort">sort</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmCollection.values" href="#pyDLCbehavior.ArmCollection.values">values</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.ArmRegion" href="#pyDLCbehavior.ArmRegion">ArmRegion</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.ArmRegion.add_point" href="#pyDLCbehavior.ArmRegion.add_point">add_point</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.add_points" href="#pyDLCbehavior.ArmRegion.add_points">add_points</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.center" href="#pyDLCbehavior.ArmRegion.center">center</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.contains" href="#pyDLCbehavior.ArmRegion.contains">contains</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.copy" href="#pyDLCbehavior.ArmRegion.copy">copy</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.draw_area" href="#pyDLCbehavior.ArmRegion.draw_area">draw_area</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.get_paired_lines" href="#pyDLCbehavior.ArmRegion.get_paired_lines">get_paired_lines</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.is_valid" href="#pyDLCbehavior.ArmRegion.is_valid">is_valid</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.merge" href="#pyDLCbehavior.ArmRegion.merge">merge</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.name" href="#pyDLCbehavior.ArmRegion.name">name</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.points" href="#pyDLCbehavior.ArmRegion.points">points</a></code></li>
+<li><code><a title="pyDLCbehavior.ArmRegion.sort" href="#pyDLCbehavior.ArmRegion.sort">sort</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.BasicYMazeCollection" href="#pyDLCbehavior.BasicYMazeCollection">BasicYMazeCollection</a></code></h4>
+<ul class="">
+<li><code><a title="pyDLCbehavior.BasicYMazeCollection.area" href="#pyDLCbehavior.BasicYMazeCollection.area">area</a></code></li>
+<li><code><a title="pyDLCbehavior.BasicYMazeCollection.data" href="#pyDLCbehavior.BasicYMazeCollection.data">data</a></code></li>
+<li><code><a title="pyDLCbehavior.BasicYMazeCollection.fit" href="#pyDLCbehavior.BasicYMazeCollection.fit">fit</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.DLCDataset" href="#pyDLCbehavior.DLCDataset">DLCDataset</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.DLCDataset.FPS" href="#pyDLCbehavior.DLCDataset.FPS">FPS</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.csv_path" href="#pyDLCbehavior.DLCDataset.csv_path">csv_path</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.dlc_model_config" href="#pyDLCbehavior.DLCDataset.dlc_model_config">dlc_model_config</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.frame_dimensions" href="#pyDLCbehavior.DLCDataset.frame_dimensions">frame_dimensions</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.from_pickle" href="#pyDLCbehavior.DLCDataset.from_pickle">from_pickle</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.homedir" href="#pyDLCbehavior.DLCDataset.homedir">homedir</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.hyperparams" href="#pyDLCbehavior.DLCDataset.hyperparams">hyperparams</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.load_csv" href="#pyDLCbehavior.DLCDataset.load_csv">load_csv</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.pkl_path" href="#pyDLCbehavior.DLCDataset.pkl_path">pkl_path</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.raw_data" href="#pyDLCbehavior.DLCDataset.raw_data">raw_data</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.to_pickle" href="#pyDLCbehavior.DLCDataset.to_pickle">to_pickle</a></code></li>
+<li><code><a title="pyDLCbehavior.DLCDataset.video_path" href="#pyDLCbehavior.DLCDataset.video_path">video_path</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis">NovelObjectRecognitionAnalysis</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.add_object" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.add_object">add_object</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.analyze" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.analyze">analyze</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.climbing_filter" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.climbing_filter">climbing_filter</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.data" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.data">data</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.filter_data" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.filter_data">filter_data</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.locomotion_data" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.locomotion_data">locomotion_data</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.mean_speed" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.mean_speed">mean_speed</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.nose2obj" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.nose2obj">nose2obj</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.num_of_objects" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.num_of_objects">num_of_objects</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.object_a" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.object_a">object_a</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.object_b" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.object_b">object_b</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.objects" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.objects">objects</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.offset" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.offset">offset</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_filter_scatter" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_filter_scatter">plot_filter_scatter</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_heatmap" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_heatmap">plot_heatmap</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_trajectory" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.plot_trajectory">plot_trajectory</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.preprocess" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.preprocess">preprocess</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.raw_data" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.raw_data">raw_data</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.scale_x" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.scale_x">scale_x</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.scale_y" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.scale_y">scale_y</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.select_objects" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.select_objects">select_objects</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.summary_df" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.summary_df">summary_df</a></code></li>
+<li><code><a title="pyDLCbehavior.NovelObjectRecognitionAnalysis.total_distance" href="#pyDLCbehavior.NovelObjectRecognitionAnalysis.total_distance">total_distance</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.Roi" href="#pyDLCbehavior.Roi">Roi</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.Roi.data" href="#pyDLCbehavior.Roi.data">data</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.distance" href="#pyDLCbehavior.Roi.distance">distance</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.draw" href="#pyDLCbehavior.Roi.draw">draw</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.height" href="#pyDLCbehavior.Roi.height">height</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.name" href="#pyDLCbehavior.Roi.name">name</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.order" href="#pyDLCbehavior.Roi.order">order</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.to_dict" href="#pyDLCbehavior.Roi.to_dict">to_dict</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.to_json_str" href="#pyDLCbehavior.Roi.to_json_str">to_json_str</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.width" href="#pyDLCbehavior.Roi.width">width</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.x" href="#pyDLCbehavior.Roi.x">x</a></code></li>
+<li><code><a title="pyDLCbehavior.Roi.y" href="#pyDLCbehavior.Roi.y">y</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.YMazeAnalysis" href="#pyDLCbehavior.YMazeAnalysis">YMazeAnalysis</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.alternation_data" href="#pyDLCbehavior.YMazeAnalysis.alternation_data">alternation_data</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.analyze" href="#pyDLCbehavior.YMazeAnalysis.analyze">analyze</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.analyze_alternation" href="#pyDLCbehavior.YMazeAnalysis.analyze_alternation">analyze_alternation</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.arms" href="#pyDLCbehavior.YMazeAnalysis.arms">arms</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.labeled_data" href="#pyDLCbehavior.YMazeAnalysis.labeled_data">labeled_data</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.locomotion_data" href="#pyDLCbehavior.YMazeAnalysis.locomotion_data">locomotion_data</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.mean_speed" href="#pyDLCbehavior.YMazeAnalysis.mean_speed">mean_speed</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.plot_alternations" href="#pyDLCbehavior.YMazeAnalysis.plot_alternations">plot_alternations</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.plot_ymaze" href="#pyDLCbehavior.YMazeAnalysis.plot_ymaze">plot_ymaze</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.preprocess" href="#pyDLCbehavior.YMazeAnalysis.preprocess">preprocess</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.savedir" href="#pyDLCbehavior.YMazeAnalysis.savedir">savedir</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.scale_x" href="#pyDLCbehavior.YMazeAnalysis.scale_x">scale_x</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.scale_y" href="#pyDLCbehavior.YMazeAnalysis.scale_y">scale_y</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.summary_df" href="#pyDLCbehavior.YMazeAnalysis.summary_df">summary_df</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.time" href="#pyDLCbehavior.YMazeAnalysis.time">time</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.total_distance" href="#pyDLCbehavior.YMazeAnalysis.total_distance">total_distance</a></code></li>
+<li><code><a title="pyDLCbehavior.YMazeAnalysis.ymaze_center" href="#pyDLCbehavior.YMazeAnalysis.ymaze_center">ymaze_center</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.YMazeScaler" href="#pyDLCbehavior.YMazeScaler">YMazeScaler</a></code></h4>
+<ul class="">
+<li><code><a title="pyDLCbehavior.YMazeScaler.reference" href="#pyDLCbehavior.YMazeScaler.reference">reference</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
