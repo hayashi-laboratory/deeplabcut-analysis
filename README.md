@@ -1,7 +1,7 @@
-# A package for analyzing the data from DeepLabCut
+# to use this script 
 
 
-# how to use this script 
+
 - Install python 3.9 using miniconda only for install python and pip
 ```
 conda create -n -y your_env_name python=3.9 
@@ -20,14 +20,12 @@ python3.9 -m venv .venv
 ```
 source ./.venv/Scripts/activate
 python3.9 -m pip install -U -r requirements.txt
-python3.9 -m pip install .
 ```
 
 - - for Linux/MacOs
 ```
 source ./.venv/bin/activate
 python3.9 -m pip install -U -r requirements.txt
-python3.9 -m pip install .
 ```
 
 
