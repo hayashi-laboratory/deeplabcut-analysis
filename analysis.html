@@ -1,0 +1,2224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>pyDLCbehavior.analysis API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}html *{font-family:Arial}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pyDLCbehavior.analysis</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from dataclasses import dataclass, field
+from datetime import timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Mapping, OrderedDict
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy import ndimage
+
+from .dataset import DLCDataset
+from .utility import Roi, setrois
+from .ymaze import ArmCollection, ArmRegion, BasicYMazeCollection, YMazeScaler
+
+
+@dataclass
+class NovelObjectRecognitionAnalysis(DLCDataset):
+
+    # ROI
+    objects: List[Roi] = field(init=False, default_factory=list)
+
+    # raw_data
+    raw_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    scale_x: float = field(init=False, default=1)
+    scale_y: float = field(init=False, default=1)
+
+    # data after analysis
+    nose2obj: int = field(init=False, default=None)
+    offset: int = field(init=False, default=None)
+    data: pd.DataFrame = field(init=False, repr=False, default=None)
+    filter_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    climbing_filter: pd.DataFrame = field(init=False, repr=False, default=None)
+
+    # the summary from center trajectory
+    locomotion_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    total_distance: float = field(init=False, default=None)
+    mean_speed: float = field(init=False, default=None)
+
+    def __post_init__(self) -&gt; None:
+        # parse the path and load the pickle file
+        super().__post_init__()
+        self.preprocess()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        super().__setstate__(d)
+        self.analyze()
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        d = super().__getstate__()
+        d.update(
+            {
+                &#34;objects&#34;: self.objects,
+                &#34;nose2obj&#34;: self.nose2obj,
+                &#34;offset&#34;: self.offset,
+            }
+        )
+        return d
+
+    @property
+    def num_of_objects(self) -&gt; int:
+        return len(self.objects)
+
+    @property
+    def object_a(self) -&gt; Roi:
+        for o in self.objects:
+            if o.name.lower().endswith(&#34;a&#34;):
+                return o
+        raise AttributeError()
+
+    @property
+    def object_b(self) -&gt; Roi:
+        for o in self.objects:
+            if o.name.lower().endswith(&#34;b&#34;):
+                return o
+        raise AttributeError()
+
+    def select_objects(self, num_of_objects: int = 2) -&gt; None:
+        &#34;&#34;&#34;select the roi object manually.
+
+        Args:
+            num_of_objects (int, optional): How many object to be selected. Defaults to 2.
+        &#34;&#34;&#34;
+        self.objects = setrois(self.video_path, num_of_objects)
+
+    def add_object(self, obj: Roi) -&gt; None:
+        &#34;&#34;&#34;Add a Roi object manually.
+
+        Args:
+            obj (Roi): A Roi instance contains (x,y, width, height, name)
+
+        Raises:
+            TypeError: Raise error if input is not Roi instance
+        &#34;&#34;&#34;
+        if not isinstance(obj, Roi):
+            raise TypeError(&#34;obj should be Roi instance&#34;)
+        self.objects.append(obj)
+
+    def preprocess(self) -&gt; None:
+        &#34;&#34;&#34;filter the raw data by moving averaging&#34;&#34;&#34;
+        # drop the scorer columns
+        raw = self.raw_data.droplevel(0, axis=1)
+
+        # Rolling the data by 5 seconds to get the reliable start time.
+        # Using nose as target to calculate the rolling mean of likelihood
+        # Get the index when mean of likelihood is larger than 0.99
+        # default is the first items
+        all_joints_names = self.dlc_model_config[&#34;all_joints_names&#34;]
+        bodypart = all_joints_names[0]
+        if &#34;nose&#34; in all_joints_names:
+            bodypart = &#34;nose&#34;
+        elif &#34;center&#34; in all_joints_names:
+            bodypart = &#34;center&#34;
+
+        rolling_window = &#34;5s&#34;
+        df_MVA = raw[bodypart, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        start = df_MVA[df_MVA &gt; 0.99].index.min()
+        # Time window for 10 minutes
+        end = start + timedelta(minutes=10)
+        raw = raw[start:end]
+        # set data to class instance
+        self.raw_data = raw
+
+    def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+        if self.num_of_objects == 0:
+            print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
+            return
+
+        self.nose2obj = self.nose2obj or nose2obj
+        self.offset = self.offset or offset
+        # copy the data from raw_data
+        data = self.raw_data.copy()
+
+        # a convinient index for slice the multi-index
+        idx = pd.IndexSlice
+
+        # get body parts
+        part_names = data.columns.get_level_values(0).unique()
+        object_names = [c for c in part_names if &#34;obj&#34; in c.lower()]
+        bodyparts = [c for c in part_names if &#34;obj&#34; not in c.lower()]
+
+        # temp class that decide the distance to ROI and predict coordinates
+        from collections import namedtuple
+
+        Coords = namedtuple(&#34;Coords&#34;, [&#34;name&#34;, &#34;coords&#34;])
+        get_coord = lambda o: Coords(o, (data[o, &#34;x&#34;].mean(), data[o, &#34;y&#34;].mean()))
+        # list of Coords(name = name, coords = (x, y))
+        dlc_objs = [get_coord(o) for o in object_names]
+
+        for roi_obj in self.objects:
+            # automatic assign the object name by distance
+            name = min(dlc_objs, key=lambda x: roi_obj.distance(*x.coords)).name
+            if not roi_obj.name:
+                roi_obj.name = f&#34;ROI_{name}&#34;
+            data.loc[:, (roi_obj.name, &#34;x&#34;)] = roi_obj.x
+            data.loc[:, (roi_obj.name, &#34;y&#34;)] = roi_obj.y
+
+        part_names = data.columns.get_level_values(0).unique()
+        # object real distance (cm)
+        real_x_cm, real_y_cm = 20, 20
+        scale_x = real_x_cm / abs(self.objects[0].x - self.objects[1].x)
+        scale_y = real_y_cm / abs(self.objects[0].y - self.objects[1].y)
+        self.scale_x, self.scale_y = scale_x, scale_y
+        # scale all coordinates to real distance (cm)
+        data.loc[:, idx[:, &#34;x&#34;]] = data.loc[:, idx[:, &#34;x&#34;]] * scale_x
+        data.loc[:, idx[:, &#34;y&#34;]] = data.loc[:, idx[:, &#34;y&#34;]] * scale_y
+
+        # Get the distance between each bodypart and object
+        for roi_obj in self.objects:
+            # create the new column names for assign the distance
+            new_cols = pd.MultiIndex.from_tuples(
+                [(b, f&#34;distance_to_{roi_obj.name}&#34;) for b in bodyparts],
+                names=[&#34;bodyparts&#34;, &#34;coords&#34;],
+            )
+            scale_obj_x = roi_obj.x * scale_x
+            scale_obj_y = roi_obj.y * scale_y
+            data[new_cols] = np.sqrt(
+                np.square(data.loc[:, idx[bodyparts, &#34;x&#34;]].values - scale_obj_x)
+                + np.square(data.loc[:, idx[bodyparts, &#34;y&#34;]].values - scale_obj_y)
+            )
+        data = data[part_names]
+
+        # calculate the distance from nose to center
+        data[&#34;nose2center&#34;] = np.sqrt(
+            np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;x&#34;]]))
+            + np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;y&#34;]]))
+        )
+        self.data = data
+
+        # first filter all data by 15cm
+        # offset default is 15 cm
+        filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+
+        # took the center position
+        center = (
+            filter_data.loc[:, idx[&#34;center&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+        )
+        center[&#34;length&#34;] = np.sqrt(np.square(center.diff()).sum(axis=1))
+        center[&#34;distance&#34;] = center[&#34;length&#34;].cumsum()
+        # delta time
+        dt = center.index[1:] - center.index[:-1]
+        # convert nsdeltatime to seconds
+        dt = dt.to_numpy().astype(float) / 1e9
+        center[&#34;speed&#34;] = np.nan
+        center[&#34;speed&#34;].iloc[1:] = center[&#34;length&#34;].iloc[1:] / dt
+        self.locomotion_data = center
+        self.total_distance = center[&#34;length&#34;].sum()
+        self.mean_speed = center[&#34;speed&#34;].mean()
+
+        for roi_obj in self.objects:
+            name = roi_obj.name
+            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+                filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
+            )
+            count = mask.sum()
+            roi_obj.data = {&#34;frame_count&#34;: count, &#34;duration&#34;: count / self.FPS}
+
+        self.filter_data = filter_data.copy()
+
+        # TODO
+        # this part is filter for ploting
+        # filter the climbing data
+        # select the nose is &lt; 4 cm and center  &gt; 4 cm
+        filter_func = lambda roi_obj: (
+            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
+            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+        )
+        # condition fit object A or object B
+        distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
+
+        filter_data = filter_data[distance_mask]
+
+        self.climbing_filter = filter_data.copy()
+
+    def __plot_objects(self, ax):
+        ax.scatter(
+            self.object_a.x * self.scale_x,
+            self.object_a.y * self.scale_y,
+            s=600,
+            c=&#34;#ff2251&#34;,
+            alpha=0.5,
+        )
+
+        ax.scatter(
+            self.object_b.x * self.scale_x,
+            self.object_b.y * self.scale_y,
+            s=600,
+            c=&#34;#00b48c&#34;,
+            alpha=0.5,
+        )
+
+    def plot_trajectory(self):
+        nose = self.filter_data.nose
+        center = self.filter_data.center
+
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        ax.plot(nose.x.values, nose.y.values, alpha=0.75)
+        ax.plot(center.x.values, center.y.values, alpha=0.75)
+        self.__plot_objects(ax)
+        ax.set_ylim(40, 0)
+        ax.set_xlim(0, 40)
+        # fig.set_title(f&#34;file: {self.csv_path.stem}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_scatter.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    def plot_filter_scatter(self):
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+
+        nose = self.climbing_filter.nose
+        center = self.climbing_filter.center
+        ax.scatter(nose.x.values, nose.y.values, alpha=0.4)
+        ax.scatter(center.x.values, center.y.values, alpha=0.4)
+        self.__plot_objects(ax)
+        ax.set_xlim(0, 40)
+        ax.set_ylim(40, 0)
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_filtered.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    def plot_heatmap(self):
+        from matplotlib import colors
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
+        nose_np_y = nose_np[:, 1]
+        nose_np_x = nose_np[:, 0]
+        # make histrogram2d
+        counts, y, x = np.histogram2d(
+            nose_np_y,
+            nose_np_x,
+            self.frame_dimensions,
+        )
+
+        # Filter by Gaussian_filter from scipy
+        counts = ndimage.gaussian_filter(counts, sigma=8)
+
+        # Heatmap with customized colormap
+        fig = plt.figure(figsize=(5, 5))
+
+        ax = fig.add_subplot(111)
+        norm = colors.LogNorm(vmin=np.nanmin(counts), vmax=np.nanmax(counts))
+        cmap = colors.LinearSegmentedColormap.from_list(
+            &#34;custom&#34;,
+            [&#34;grey&#34;, &#34;#edf8e9&#34;, &#34;#74c476&#34;, &#34;#006d2c&#34;],
+            N=64,
+        )
+        # colmap = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+        im = ax.imshow(counts, cmap=cmap)
+        # create an axes on the right side of ax. The width of cax will be 5%
+        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+        fig.colorbar(im, cax=cax)
+
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_heatmap.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    @property
+    def summary_df(self) -&gt; pd.DataFrame:
+        z1 = self.object_a.data[&#34;frame_count&#34;]
+        z2 = self.object_b.data[&#34;frame_count&#34;]
+        total = z1 + z2
+        return pd.DataFrame.from_dict(
+            OrderedDict(
+                filename=[self.csv_path.stem],
+                FrameNumber_exploration_Zone1=[z1],
+                FrameNumber_exploration_Zone2=[z2],
+                video_fps=[self.FPS],
+                Time_exploration_Zone1=[self.object_a.data[&#34;duration&#34;]],
+                Time_exploration_Zone2=[self.object_b.data[&#34;duration&#34;]],
+                Zone1_x=[self.object_a.x * self.scale_x],
+                Zone1_y=[self.object_a.y * self.scale_y],
+                Zone2_x=[self.object_a.x * self.scale_x],
+                Zone2_y=[self.object_a.y * self.scale_y],
+                Zone1_coord=[(self.object_a.x, self.object_a.y)],
+                Zone2_coord=[(self.object_b.x, self.object_b.y)],
+                video_shape_w=[self.frame_dimensions[0]],
+                video_shape_h=[self.frame_dimensions[0]],
+                Discrimination_index_Zone1_to_Zone2=[(z1 - z2) / total],
+                Discrimination_index_Zone2_to_Zone1=[(z2 - z1) / total],
+                total_distance=[self.total_distance],
+                mean_speed=[self.mean_speed],
+            )
+        )
+
+
+@dataclass
+class YMazeAnalysis(DLCDataset):
+    # analysis time window
+    time: int = 8
+    savedir: Path = field(init=False)
+
+    # scale parameters
+    scale_x: float = field(init=False, default=1)
+    scale_y: float = field(init=False, default=1)
+
+    # data after analysis
+    labeled_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    arms: ArmCollection = field(init=False, default_factory=ArmCollection)
+    ymaze_center: np.ndarray = field(init=False, repr=False, default=None)
+    alternation_data: Dict[str, Any] = field(
+        init=False, repr=False, default_factory=dict
+    )
+
+    # the summary from center trajectory
+    locomotion_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    total_distance: float = field(init=False, default=None)
+    mean_speed: float = field(init=False, default=None)
+
+    def __post_init__(self) -&gt; None:
+        super().__post_init__()
+        self.savedir = self.homedir.joinpath(&#34;save&#34;, f&#34;{self.time}min&#34;)
+        if not self.savedir.exists():
+            self.savedir.mkdir(parents=True)
+        self.preprocess()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        super().__setstate__(d)
+        self.savedir = self.homedir.joinpath(&#34;save&#34;, f&#34;{self.time}min&#34;)
+        self.analyze()
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        d = super().__getstate__()
+        d.update({&#34;time&#34;: self.time, &#34;arms&#34;: self.arms})
+        return d
+
+    def preprocess(self) -&gt; None:
+        raw = self.raw_data.droplevel(0, axis=1)
+        # Rolling the data by 5 seconds to get the reliable start time.
+        # Using nose as target to calculate the rolling mean of likelihood
+        # Get the index when mean of likelihood is larger than 0.99
+        # default is the first items
+        rolling_window = &#34;3s&#34;
+        nose_MVA = raw[&#34;Nose&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        withers_MVA = raw[&#34;Withers&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        start = raw[(nose_MVA &gt; 0.95) &amp; (withers_MVA &gt; 0.95)].index.min()
+        # Time window for 8 minutes
+        end = start + timedelta(minutes=self.time)
+        raw = raw[start:end]
+        # set filter data to raw_data
+        self.raw_data = raw
+
+    def analyze(self):
+        # copy data
+        data = self.raw_data.copy()
+        # index slice
+        idx = pd.IndexSlice
+
+        # filter the data by distance from nose to withers
+        nose2wither = np.sqrt(
+            np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;x&#34;]]))
+            + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
+        )
+        data = data[nose2wither &lt; np.square(100)]
+
+        arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
+        ref_pt = []
+        #temp_arms = ArmCollection()
+        for a in arm_tags:
+            name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
+            mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
+            xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
+            arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+            ref_pt.append(arm_center)
+
+        # fit the abstract arm by DeepLabCut coordinates
+        arms: ArmCollection = BasicYMazeCollection()
+        arms.fit(ref_pt)
+
+        # mean pos_x, pos_y
+        middle_body_pos = (data.Nose[[&#34;x&#34;, &#34;y&#34;]] + data.Withers[[&#34;x&#34;, &#34;y&#34;]]) / 2
+
+        data[&#34;mask&#34;] = &#34;undefined&#34;
+        for arm in arms.values():
+            mask = middle_body_pos.apply(lambda pt: arm.contains(pt.x, pt.y), axis=1)
+            data.loc[mask, &#34;mask&#34;] = arm.name
+
+        ymaze_center = arms.center
+        calc_dist2center = lambda pt: np.square(pt - ymaze_center).sum() &lt; np.square(
+            100
+        )
+        mask = middle_body_pos.apply(calc_dist2center, axis=1, raw=True)
+        data.loc[mask, &#34;mask&#34;] = &#34;o&#34;
+
+        ###################################################
+        # Get the property of locomotor activity.
+        # Length x between center and mean point of arm1 and 2 is around 40 cm * sqrt(3) / 2
+        # Lenght y between center and mean point of arm1 and 2 is around 40 cm * 1 / 2
+        # Total distance is calculated following ARIMA model (moving average)
+        ###################################################
+
+        xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
+
+        scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
+        
+        withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+
+        # Set the rolling time window as 5
+        rolling_window = &#34;5s&#34;
+        withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
+        
+        scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
+        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        self.scale_x = abs(pt1[0] - pt2[0])
+        self.scale_y = abs(pt1[1] - pt2[1])
+
+        withers[[&#34;x&#34;, &#34;y&#34;]] = scaler.scale(withers.values)
+        # withers[&#34;x&#34;] = withers[&#34;x&#34;] * scale_x
+        # withers[&#34;y&#34;] = withers[&#34;y&#34;] * scale_y
+
+        withers[&#34;length&#34;] = np.sqrt(np.square(withers.diff()).sum(axis=1))
+        withers[&#34;distance&#34;] = withers[&#34;length&#34;].cumsum()
+        # delta time
+        dt = withers.index[1:] - withers.index[:-1]
+        # convert nsdeltatime to seconds
+        dt = dt.to_numpy().astype(float) / 1e9
+        withers[&#34;speed&#34;] = np.nan
+        withers[&#34;speed&#34;].iloc[1:] = withers[&#34;length&#34;].iloc[1:] / dt
+
+        self.locomotion_data = withers
+        self.total_distance = withers[&#34;length&#34;].sum()
+        self.mean_speed = withers[&#34;speed&#34;].mean()
+
+        self.ymaze_center = ymaze_center
+        self.arms = arms
+        self.labeled_data = data
+
+        # analysis the alternation
+        self.analyze_alternation()
+
+    def analyze_alternation(self):
+        data = self.labeled_data
+        labels = data[&#34;mask&#34;].copy()
+        start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+        labels = labels.loc[start:]
+        labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+        labels = labels.ffill()
+        labels.index.name = &#34;time&#34;
+        onset = (
+            labels[labels != labels.shift(1)]
+            .reset_index()
+            .rename(columns={&#34;mask&#34;: &#34;onset&#34;, &#34;time&#34;: &#34;onset_time&#34;})
+        )
+        offset = (
+            labels[labels != labels.shift(-1)]
+            .reset_index()
+            .rename(columns={&#34;mask&#34;: &#34;offset&#34;, &#34;time&#34;: &#34;offset_time&#34;})
+        )
+
+        alt_df = pd.concat([onset, offset], axis=1)
+        alt_df[&#34;duration&#34;] = alt_df[&#34;offset_time&#34;] - alt_df[&#34;onset_time&#34;]
+        total_row = len(alt_df)
+        num_of_arms = (alt_df.onset != &#34;o&#34;).sum()
+        #### Fetch the alternation, which is the count of arm entries that a mouse does not entry in the same arm over 3 entries.
+        #### Compared to next 2 entries.
+        arm_label = alt_df[alt_df.onset != &#34;o&#34;].onset
+
+        alt_mask = (
+            (arm_label != arm_label.shift(-1))
+            &amp; (arm_label != arm_label.shift(-2))
+            &amp; (arm_label.shift(-1) != arm_label.shift(-2))
+        )
+        alt = alt_mask.sum()
+        # Alternation ratio calculation
+        alternation_ratio = alt / (num_of_arms - 2) * 100
+        alternation_ratio = np.round(alternation_ratio, 3)
+
+        # Store each varibale in alt_dict
+        alternation_data = {
+            &#34;spontaneous_alternation&#34;: alt,  # Spontaneous_alternation
+            &#34;alternation_ratio&#34;: alternation_ratio,  # Alternation_ratio
+            &#34;arm_entries&#34;: num_of_arms,  # Arm_entries
+            &#34;alternation_order&#34;: alt_df,
+        }
+        self.alternation_data = alternation_data
+
+    def plot_ymaze(self) -&gt; mpl.figure.Figure:
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        data = self.labeled_data
+        withers = data[&#34;Withers&#34;]
+        ax.plot(withers.x, withers.y, alpha=0.2)
+
+        import re
+        from itertools import cycle
+
+        colors = str(plt.rcParams[&#34;axes.prop_cycle&#34;])
+        colors = cycle(
+            map(lambda s: s.strip(&#34; &#39;&#34;), re.findall(r&#34;&#39;#.*&#39;&#34;, colors)[0].split(&#34;,&#34;))
+        )
+        [next(colors) for _ in range(2)]
+
+        for arm, c in zip(self.arms.values(), colors):
+            ax.text(*arm.center, arm.name, size=12)
+            arm.draw_area(ax, facecolor=c + &#34;70&#34;, zorder=2)
+        ax.scatter(*self.ymaze_center, c=&#34;red&#34;)
+
+        for label in [&#34;o&#34;, &#34;A&#34;, &#34;B&#34;, &#34;C&#34;]:
+            filter_withers = data.loc[data[&#34;mask&#34;] == label, &#34;Withers&#34;]
+            ax.plot(filter_withers.x, filter_withers.y)
+
+        self.arms.draw_contour(ax, facecolor=&#34;0.9&#34;, edgecolor=&#34;0.5&#34;)
+
+        width, height = self.frame_dimensions
+        ax.set_xlim(0, width)
+        ax.set_ylim(height, 0)
+        filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+        ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.savedir.joinpath(f&#34;{filename}_Ymaze_apperance_{self.time}.png&#34;)
+        )
+        return fig
+
+    def plot_alternations(self) -&gt; mpl.figure.Figure:
+        data = self.labeled_data
+        labels = data[&#34;mask&#34;].copy()
+        start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+        labels = labels.loc[start:]
+        labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+        labels = labels.ffill()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        from collections import defaultdict
+
+        dic = defaultdict(lambda: 5, A=1, B=2, C=3, o=4)
+
+        label_nums = labels.replace(dic)
+        ax.plot(label_nums)
+        ax.plot(label_nums.diff())
+        # set labels
+        group_labels = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;Center&#34;, &#34;Others&#34;]
+        ax.set_yticks([1, 2, 3, 4, 5])
+        ax.set_yticklabels(group_labels)
+        ax.set_ylim(0, 6)
+        filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+        ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.savedir.joinpath(f&#34;{filename}_Ymaze_alternation_{self.time}min.png&#34;)
+        )
+        return fig
+
+    @property
+    def summary_df(self) -&gt; pd.DataFrame:
+        return pd.DataFrame.from_dict(
+            OrderedDict(
+                filename=[self.csv_path.stem],
+                video_shape=[self.frame_dimensions],
+                video_fps=[self.FPS],
+                arm_entries=[self.alternation_data[&#34;arm_entries&#34;]],
+                spontaneous_alternation=[
+                    self.alternation_data[&#34;spontaneous_alternation&#34;]
+                ],
+                total_distance=[self.total_distance],
+                mean_speed=[self.mean_speed],
+            )
+        )
+
+
+if __name__ == &#34;__main__&#34;:
+    pkl = &#34;data/YMAZE/00228_DLC_resnet50_Ymaze_project-DLC-2020-10-13Oct13shuffle1_140000_meta.pickle&#34;
+    csv = &#34;data/YMAZE/00228_DLC_resnet50_Ymaze_project-DLC-2020-10-13Oct13shuffle1_140000.csv&#34;
+    ymaze = YMazeAnalysis(csv, pkl)
+    ymaze.analyze()
+    ymaze.plot_ymaze()
+    ymaze.plot_alternations()
+    pickle_path = ymaze.to_pickle()
+    ymaze = YMazeAnalysis.from_pickle(pickle_path)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis"><code class="flex name class">
+<span>class <span class="ident">NovelObjectRecognitionAnalysis</span></span>
+<span>(</span><span>csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NovelObjectRecognitionAnalysis(csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class NovelObjectRecognitionAnalysis(DLCDataset):
+
+    # ROI
+    objects: List[Roi] = field(init=False, default_factory=list)
+
+    # raw_data
+    raw_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    scale_x: float = field(init=False, default=1)
+    scale_y: float = field(init=False, default=1)
+
+    # data after analysis
+    nose2obj: int = field(init=False, default=None)
+    offset: int = field(init=False, default=None)
+    data: pd.DataFrame = field(init=False, repr=False, default=None)
+    filter_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    climbing_filter: pd.DataFrame = field(init=False, repr=False, default=None)
+
+    # the summary from center trajectory
+    locomotion_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    total_distance: float = field(init=False, default=None)
+    mean_speed: float = field(init=False, default=None)
+
+    def __post_init__(self) -&gt; None:
+        # parse the path and load the pickle file
+        super().__post_init__()
+        self.preprocess()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        super().__setstate__(d)
+        self.analyze()
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        d = super().__getstate__()
+        d.update(
+            {
+                &#34;objects&#34;: self.objects,
+                &#34;nose2obj&#34;: self.nose2obj,
+                &#34;offset&#34;: self.offset,
+            }
+        )
+        return d
+
+    @property
+    def num_of_objects(self) -&gt; int:
+        return len(self.objects)
+
+    @property
+    def object_a(self) -&gt; Roi:
+        for o in self.objects:
+            if o.name.lower().endswith(&#34;a&#34;):
+                return o
+        raise AttributeError()
+
+    @property
+    def object_b(self) -&gt; Roi:
+        for o in self.objects:
+            if o.name.lower().endswith(&#34;b&#34;):
+                return o
+        raise AttributeError()
+
+    def select_objects(self, num_of_objects: int = 2) -&gt; None:
+        &#34;&#34;&#34;select the roi object manually.
+
+        Args:
+            num_of_objects (int, optional): How many object to be selected. Defaults to 2.
+        &#34;&#34;&#34;
+        self.objects = setrois(self.video_path, num_of_objects)
+
+    def add_object(self, obj: Roi) -&gt; None:
+        &#34;&#34;&#34;Add a Roi object manually.
+
+        Args:
+            obj (Roi): A Roi instance contains (x,y, width, height, name)
+
+        Raises:
+            TypeError: Raise error if input is not Roi instance
+        &#34;&#34;&#34;
+        if not isinstance(obj, Roi):
+            raise TypeError(&#34;obj should be Roi instance&#34;)
+        self.objects.append(obj)
+
+    def preprocess(self) -&gt; None:
+        &#34;&#34;&#34;filter the raw data by moving averaging&#34;&#34;&#34;
+        # drop the scorer columns
+        raw = self.raw_data.droplevel(0, axis=1)
+
+        # Rolling the data by 5 seconds to get the reliable start time.
+        # Using nose as target to calculate the rolling mean of likelihood
+        # Get the index when mean of likelihood is larger than 0.99
+        # default is the first items
+        all_joints_names = self.dlc_model_config[&#34;all_joints_names&#34;]
+        bodypart = all_joints_names[0]
+        if &#34;nose&#34; in all_joints_names:
+            bodypart = &#34;nose&#34;
+        elif &#34;center&#34; in all_joints_names:
+            bodypart = &#34;center&#34;
+
+        rolling_window = &#34;5s&#34;
+        df_MVA = raw[bodypart, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        start = df_MVA[df_MVA &gt; 0.99].index.min()
+        # Time window for 10 minutes
+        end = start + timedelta(minutes=10)
+        raw = raw[start:end]
+        # set data to class instance
+        self.raw_data = raw
+
+    def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+        if self.num_of_objects == 0:
+            print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
+            return
+
+        self.nose2obj = self.nose2obj or nose2obj
+        self.offset = self.offset or offset
+        # copy the data from raw_data
+        data = self.raw_data.copy()
+
+        # a convinient index for slice the multi-index
+        idx = pd.IndexSlice
+
+        # get body parts
+        part_names = data.columns.get_level_values(0).unique()
+        object_names = [c for c in part_names if &#34;obj&#34; in c.lower()]
+        bodyparts = [c for c in part_names if &#34;obj&#34; not in c.lower()]
+
+        # temp class that decide the distance to ROI and predict coordinates
+        from collections import namedtuple
+
+        Coords = namedtuple(&#34;Coords&#34;, [&#34;name&#34;, &#34;coords&#34;])
+        get_coord = lambda o: Coords(o, (data[o, &#34;x&#34;].mean(), data[o, &#34;y&#34;].mean()))
+        # list of Coords(name = name, coords = (x, y))
+        dlc_objs = [get_coord(o) for o in object_names]
+
+        for roi_obj in self.objects:
+            # automatic assign the object name by distance
+            name = min(dlc_objs, key=lambda x: roi_obj.distance(*x.coords)).name
+            if not roi_obj.name:
+                roi_obj.name = f&#34;ROI_{name}&#34;
+            data.loc[:, (roi_obj.name, &#34;x&#34;)] = roi_obj.x
+            data.loc[:, (roi_obj.name, &#34;y&#34;)] = roi_obj.y
+
+        part_names = data.columns.get_level_values(0).unique()
+        # object real distance (cm)
+        real_x_cm, real_y_cm = 20, 20
+        scale_x = real_x_cm / abs(self.objects[0].x - self.objects[1].x)
+        scale_y = real_y_cm / abs(self.objects[0].y - self.objects[1].y)
+        self.scale_x, self.scale_y = scale_x, scale_y
+        # scale all coordinates to real distance (cm)
+        data.loc[:, idx[:, &#34;x&#34;]] = data.loc[:, idx[:, &#34;x&#34;]] * scale_x
+        data.loc[:, idx[:, &#34;y&#34;]] = data.loc[:, idx[:, &#34;y&#34;]] * scale_y
+
+        # Get the distance between each bodypart and object
+        for roi_obj in self.objects:
+            # create the new column names for assign the distance
+            new_cols = pd.MultiIndex.from_tuples(
+                [(b, f&#34;distance_to_{roi_obj.name}&#34;) for b in bodyparts],
+                names=[&#34;bodyparts&#34;, &#34;coords&#34;],
+            )
+            scale_obj_x = roi_obj.x * scale_x
+            scale_obj_y = roi_obj.y * scale_y
+            data[new_cols] = np.sqrt(
+                np.square(data.loc[:, idx[bodyparts, &#34;x&#34;]].values - scale_obj_x)
+                + np.square(data.loc[:, idx[bodyparts, &#34;y&#34;]].values - scale_obj_y)
+            )
+        data = data[part_names]
+
+        # calculate the distance from nose to center
+        data[&#34;nose2center&#34;] = np.sqrt(
+            np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;x&#34;]]))
+            + np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;y&#34;]]))
+        )
+        self.data = data
+
+        # first filter all data by 15cm
+        # offset default is 15 cm
+        filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+
+        # took the center position
+        center = (
+            filter_data.loc[:, idx[&#34;center&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+        )
+        center[&#34;length&#34;] = np.sqrt(np.square(center.diff()).sum(axis=1))
+        center[&#34;distance&#34;] = center[&#34;length&#34;].cumsum()
+        # delta time
+        dt = center.index[1:] - center.index[:-1]
+        # convert nsdeltatime to seconds
+        dt = dt.to_numpy().astype(float) / 1e9
+        center[&#34;speed&#34;] = np.nan
+        center[&#34;speed&#34;].iloc[1:] = center[&#34;length&#34;].iloc[1:] / dt
+        self.locomotion_data = center
+        self.total_distance = center[&#34;length&#34;].sum()
+        self.mean_speed = center[&#34;speed&#34;].mean()
+
+        for roi_obj in self.objects:
+            name = roi_obj.name
+            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+                filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
+            )
+            count = mask.sum()
+            roi_obj.data = {&#34;frame_count&#34;: count, &#34;duration&#34;: count / self.FPS}
+
+        self.filter_data = filter_data.copy()
+
+        # TODO
+        # this part is filter for ploting
+        # filter the climbing data
+        # select the nose is &lt; 4 cm and center  &gt; 4 cm
+        filter_func = lambda roi_obj: (
+            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
+            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+        )
+        # condition fit object A or object B
+        distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
+
+        filter_data = filter_data[distance_mask]
+
+        self.climbing_filter = filter_data.copy()
+
+    def __plot_objects(self, ax):
+        ax.scatter(
+            self.object_a.x * self.scale_x,
+            self.object_a.y * self.scale_y,
+            s=600,
+            c=&#34;#ff2251&#34;,
+            alpha=0.5,
+        )
+
+        ax.scatter(
+            self.object_b.x * self.scale_x,
+            self.object_b.y * self.scale_y,
+            s=600,
+            c=&#34;#00b48c&#34;,
+            alpha=0.5,
+        )
+
+    def plot_trajectory(self):
+        nose = self.filter_data.nose
+        center = self.filter_data.center
+
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        ax.plot(nose.x.values, nose.y.values, alpha=0.75)
+        ax.plot(center.x.values, center.y.values, alpha=0.75)
+        self.__plot_objects(ax)
+        ax.set_ylim(40, 0)
+        ax.set_xlim(0, 40)
+        # fig.set_title(f&#34;file: {self.csv_path.stem}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_scatter.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    def plot_filter_scatter(self):
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+
+        nose = self.climbing_filter.nose
+        center = self.climbing_filter.center
+        ax.scatter(nose.x.values, nose.y.values, alpha=0.4)
+        ax.scatter(center.x.values, center.y.values, alpha=0.4)
+        self.__plot_objects(ax)
+        ax.set_xlim(0, 40)
+        ax.set_ylim(40, 0)
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_filtered.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    def plot_heatmap(self):
+        from matplotlib import colors
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
+        nose_np_y = nose_np[:, 1]
+        nose_np_x = nose_np[:, 0]
+        # make histrogram2d
+        counts, y, x = np.histogram2d(
+            nose_np_y,
+            nose_np_x,
+            self.frame_dimensions,
+        )
+
+        # Filter by Gaussian_filter from scipy
+        counts = ndimage.gaussian_filter(counts, sigma=8)
+
+        # Heatmap with customized colormap
+        fig = plt.figure(figsize=(5, 5))
+
+        ax = fig.add_subplot(111)
+        norm = colors.LogNorm(vmin=np.nanmin(counts), vmax=np.nanmax(counts))
+        cmap = colors.LinearSegmentedColormap.from_list(
+            &#34;custom&#34;,
+            [&#34;grey&#34;, &#34;#edf8e9&#34;, &#34;#74c476&#34;, &#34;#006d2c&#34;],
+            N=64,
+        )
+        # colmap = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+        im = ax.imshow(counts, cmap=cmap)
+        # create an axes on the right side of ax. The width of cax will be 5%
+        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+        fig.colorbar(im, cax=cax)
+
+        fig.tight_layout()
+        fig.savefig(
+            self.homedir.joinpath(f&#34;{self.csv_path.stem}_heatmap.png&#34;),
+            transparent=True,
+        )
+        return fig
+
+    @property
+    def summary_df(self) -&gt; pd.DataFrame:
+        z1 = self.object_a.data[&#34;frame_count&#34;]
+        z2 = self.object_b.data[&#34;frame_count&#34;]
+        total = z1 + z2
+        return pd.DataFrame.from_dict(
+            OrderedDict(
+                filename=[self.csv_path.stem],
+                FrameNumber_exploration_Zone1=[z1],
+                FrameNumber_exploration_Zone2=[z2],
+                video_fps=[self.FPS],
+                Time_exploration_Zone1=[self.object_a.data[&#34;duration&#34;]],
+                Time_exploration_Zone2=[self.object_b.data[&#34;duration&#34;]],
+                Zone1_x=[self.object_a.x * self.scale_x],
+                Zone1_y=[self.object_a.y * self.scale_y],
+                Zone2_x=[self.object_a.x * self.scale_x],
+                Zone2_y=[self.object_a.y * self.scale_y],
+                Zone1_coord=[(self.object_a.x, self.object_a.y)],
+                Zone2_coord=[(self.object_b.x, self.object_b.y)],
+                video_shape_w=[self.frame_dimensions[0]],
+                video_shape_h=[self.frame_dimensions[0]],
+                Discrimination_index_Zone1_to_Zone2=[(z1 - z2) / total],
+                Discrimination_index_Zone2_to_Zone1=[(z2 - z1) / total],
+                total_distance=[self.total_distance],
+                mean_speed=[self.mean_speed],
+            )
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.climbing_filter"><code class="name">var <span class="ident">climbing_filter</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.data"><code class="name">var <span class="ident">data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.filter_data"><code class="name">var <span class="ident">filter_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.locomotion_data"><code class="name">var <span class="ident">locomotion_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.mean_speed"><code class="name">var <span class="ident">mean_speed</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.nose2obj"><code class="name">var <span class="ident">nose2obj</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.objects"><code class="name">var <span class="ident">objects</span> : List[<a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.offset"><code class="name">var <span class="ident">offset</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.raw_data"><code class="name">var <span class="ident">raw_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.scale_x"><code class="name">var <span class="ident">scale_x</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.scale_y"><code class="name">var <span class="ident">scale_y</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.total_distance"><code class="name">var <span class="ident">total_distance</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.num_of_objects"><code class="name">var <span class="ident">num_of_objects</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def num_of_objects(self) -&gt; int:
+    return len(self.objects)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.object_a"><code class="name">var <span class="ident">object_a</span> : <a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def object_a(self) -&gt; Roi:
+    for o in self.objects:
+        if o.name.lower().endswith(&#34;a&#34;):
+            return o
+    raise AttributeError()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.object_b"><code class="name">var <span class="ident">object_b</span> : <a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def object_b(self) -&gt; Roi:
+    for o in self.objects:
+        if o.name.lower().endswith(&#34;b&#34;):
+            return o
+    raise AttributeError()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.summary_df"><code class="name">var <span class="ident">summary_df</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def summary_df(self) -&gt; pd.DataFrame:
+    z1 = self.object_a.data[&#34;frame_count&#34;]
+    z2 = self.object_b.data[&#34;frame_count&#34;]
+    total = z1 + z2
+    return pd.DataFrame.from_dict(
+        OrderedDict(
+            filename=[self.csv_path.stem],
+            FrameNumber_exploration_Zone1=[z1],
+            FrameNumber_exploration_Zone2=[z2],
+            video_fps=[self.FPS],
+            Time_exploration_Zone1=[self.object_a.data[&#34;duration&#34;]],
+            Time_exploration_Zone2=[self.object_b.data[&#34;duration&#34;]],
+            Zone1_x=[self.object_a.x * self.scale_x],
+            Zone1_y=[self.object_a.y * self.scale_y],
+            Zone2_x=[self.object_a.x * self.scale_x],
+            Zone2_y=[self.object_a.y * self.scale_y],
+            Zone1_coord=[(self.object_a.x, self.object_a.y)],
+            Zone2_coord=[(self.object_b.x, self.object_b.y)],
+            video_shape_w=[self.frame_dimensions[0]],
+            video_shape_h=[self.frame_dimensions[0]],
+            Discrimination_index_Zone1_to_Zone2=[(z1 - z2) / total],
+            Discrimination_index_Zone2_to_Zone1=[(z2 - z1) / total],
+            total_distance=[self.total_distance],
+            mean_speed=[self.mean_speed],
+        )
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.add_object"><code class="name flex">
+<span>def <span class="ident">add_object</span></span>(<span>self, obj: <a title="pyDLCbehavior.utility.Roi" href="utility.html#pyDLCbehavior.utility.Roi">Roi</a>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Roi object manually.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj</code></strong> :&ensp;<code>Roi</code></dt>
+<dd>A Roi instance contains (x,y, width, height, name)</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>Raise error if input is not Roi instance</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_object(self, obj: Roi) -&gt; None:
+    &#34;&#34;&#34;Add a Roi object manually.
+
+    Args:
+        obj (Roi): A Roi instance contains (x,y, width, height, name)
+
+    Raises:
+        TypeError: Raise error if input is not Roi instance
+    &#34;&#34;&#34;
+    if not isinstance(obj, Roi):
+        raise TypeError(&#34;obj should be Roi instance&#34;)
+    self.objects.append(obj)</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.analyze"><code class="name flex">
+<span>def <span class="ident">analyze</span></span>(<span>self, nose2obj: int = 4, offset: int = 15) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+    if self.num_of_objects == 0:
+        print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
+        return
+
+    self.nose2obj = self.nose2obj or nose2obj
+    self.offset = self.offset or offset
+    # copy the data from raw_data
+    data = self.raw_data.copy()
+
+    # a convinient index for slice the multi-index
+    idx = pd.IndexSlice
+
+    # get body parts
+    part_names = data.columns.get_level_values(0).unique()
+    object_names = [c for c in part_names if &#34;obj&#34; in c.lower()]
+    bodyparts = [c for c in part_names if &#34;obj&#34; not in c.lower()]
+
+    # temp class that decide the distance to ROI and predict coordinates
+    from collections import namedtuple
+
+    Coords = namedtuple(&#34;Coords&#34;, [&#34;name&#34;, &#34;coords&#34;])
+    get_coord = lambda o: Coords(o, (data[o, &#34;x&#34;].mean(), data[o, &#34;y&#34;].mean()))
+    # list of Coords(name = name, coords = (x, y))
+    dlc_objs = [get_coord(o) for o in object_names]
+
+    for roi_obj in self.objects:
+        # automatic assign the object name by distance
+        name = min(dlc_objs, key=lambda x: roi_obj.distance(*x.coords)).name
+        if not roi_obj.name:
+            roi_obj.name = f&#34;ROI_{name}&#34;
+        data.loc[:, (roi_obj.name, &#34;x&#34;)] = roi_obj.x
+        data.loc[:, (roi_obj.name, &#34;y&#34;)] = roi_obj.y
+
+    part_names = data.columns.get_level_values(0).unique()
+    # object real distance (cm)
+    real_x_cm, real_y_cm = 20, 20
+    scale_x = real_x_cm / abs(self.objects[0].x - self.objects[1].x)
+    scale_y = real_y_cm / abs(self.objects[0].y - self.objects[1].y)
+    self.scale_x, self.scale_y = scale_x, scale_y
+    # scale all coordinates to real distance (cm)
+    data.loc[:, idx[:, &#34;x&#34;]] = data.loc[:, idx[:, &#34;x&#34;]] * scale_x
+    data.loc[:, idx[:, &#34;y&#34;]] = data.loc[:, idx[:, &#34;y&#34;]] * scale_y
+
+    # Get the distance between each bodypart and object
+    for roi_obj in self.objects:
+        # create the new column names for assign the distance
+        new_cols = pd.MultiIndex.from_tuples(
+            [(b, f&#34;distance_to_{roi_obj.name}&#34;) for b in bodyparts],
+            names=[&#34;bodyparts&#34;, &#34;coords&#34;],
+        )
+        scale_obj_x = roi_obj.x * scale_x
+        scale_obj_y = roi_obj.y * scale_y
+        data[new_cols] = np.sqrt(
+            np.square(data.loc[:, idx[bodyparts, &#34;x&#34;]].values - scale_obj_x)
+            + np.square(data.loc[:, idx[bodyparts, &#34;y&#34;]].values - scale_obj_y)
+        )
+    data = data[part_names]
+
+    # calculate the distance from nose to center
+    data[&#34;nose2center&#34;] = np.sqrt(
+        np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;x&#34;]]))
+        + np.square(np.diff(data.loc[:, idx[[&#34;nose&#34;, &#34;center&#34;], &#34;y&#34;]]))
+    )
+    self.data = data
+
+    # first filter all data by 15cm
+    # offset default is 15 cm
+    filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+
+    # took the center position
+    center = (
+        filter_data.loc[:, idx[&#34;center&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+    )
+    center[&#34;length&#34;] = np.sqrt(np.square(center.diff()).sum(axis=1))
+    center[&#34;distance&#34;] = center[&#34;length&#34;].cumsum()
+    # delta time
+    dt = center.index[1:] - center.index[:-1]
+    # convert nsdeltatime to seconds
+    dt = dt.to_numpy().astype(float) / 1e9
+    center[&#34;speed&#34;] = np.nan
+    center[&#34;speed&#34;].iloc[1:] = center[&#34;length&#34;].iloc[1:] / dt
+    self.locomotion_data = center
+    self.total_distance = center[&#34;length&#34;].sum()
+    self.mean_speed = center[&#34;speed&#34;].mean()
+
+    for roi_obj in self.objects:
+        name = roi_obj.name
+        mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+            filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
+        )
+        count = mask.sum()
+        roi_obj.data = {&#34;frame_count&#34;: count, &#34;duration&#34;: count / self.FPS}
+
+    self.filter_data = filter_data.copy()
+
+    # TODO
+    # this part is filter for ploting
+    # filter the climbing data
+    # select the nose is &lt; 4 cm and center  &gt; 4 cm
+    filter_func = lambda roi_obj: (
+        (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
+        &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+    )
+    # condition fit object A or object B
+    distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
+
+    filter_data = filter_data[distance_mask]
+
+    self.climbing_filter = filter_data.copy()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_filter_scatter"><code class="name flex">
+<span>def <span class="ident">plot_filter_scatter</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_filter_scatter(self):
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111)
+
+    nose = self.climbing_filter.nose
+    center = self.climbing_filter.center
+    ax.scatter(nose.x.values, nose.y.values, alpha=0.4)
+    ax.scatter(center.x.values, center.y.values, alpha=0.4)
+    self.__plot_objects(ax)
+    ax.set_xlim(0, 40)
+    ax.set_ylim(40, 0)
+    fig.tight_layout()
+    fig.savefig(
+        self.homedir.joinpath(f&#34;{self.csv_path.stem}_filtered.png&#34;),
+        transparent=True,
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_heatmap"><code class="name flex">
+<span>def <span class="ident">plot_heatmap</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_heatmap(self):
+    from matplotlib import colors
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
+    nose_np_y = nose_np[:, 1]
+    nose_np_x = nose_np[:, 0]
+    # make histrogram2d
+    counts, y, x = np.histogram2d(
+        nose_np_y,
+        nose_np_x,
+        self.frame_dimensions,
+    )
+
+    # Filter by Gaussian_filter from scipy
+    counts = ndimage.gaussian_filter(counts, sigma=8)
+
+    # Heatmap with customized colormap
+    fig = plt.figure(figsize=(5, 5))
+
+    ax = fig.add_subplot(111)
+    norm = colors.LogNorm(vmin=np.nanmin(counts), vmax=np.nanmax(counts))
+    cmap = colors.LinearSegmentedColormap.from_list(
+        &#34;custom&#34;,
+        [&#34;grey&#34;, &#34;#edf8e9&#34;, &#34;#74c476&#34;, &#34;#006d2c&#34;],
+        N=64,
+    )
+    # colmap = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+    im = ax.imshow(counts, cmap=cmap)
+    # create an axes on the right side of ax. The width of cax will be 5%
+    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+    fig.colorbar(im, cax=cax)
+
+    fig.tight_layout()
+    fig.savefig(
+        self.homedir.joinpath(f&#34;{self.csv_path.stem}_heatmap.png&#34;),
+        transparent=True,
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_trajectory"><code class="name flex">
+<span>def <span class="ident">plot_trajectory</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_trajectory(self):
+    nose = self.filter_data.nose
+    center = self.filter_data.center
+
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111)
+    ax.plot(nose.x.values, nose.y.values, alpha=0.75)
+    ax.plot(center.x.values, center.y.values, alpha=0.75)
+    self.__plot_objects(ax)
+    ax.set_ylim(40, 0)
+    ax.set_xlim(0, 40)
+    # fig.set_title(f&#34;file: {self.csv_path.stem}&#34;)
+    fig.tight_layout()
+    fig.savefig(
+        self.homedir.joinpath(f&#34;{self.csv_path.stem}_scatter.png&#34;),
+        transparent=True,
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.preprocess"><code class="name flex">
+<span>def <span class="ident">preprocess</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>filter the raw data by moving averaging</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess(self) -&gt; None:
+    &#34;&#34;&#34;filter the raw data by moving averaging&#34;&#34;&#34;
+    # drop the scorer columns
+    raw = self.raw_data.droplevel(0, axis=1)
+
+    # Rolling the data by 5 seconds to get the reliable start time.
+    # Using nose as target to calculate the rolling mean of likelihood
+    # Get the index when mean of likelihood is larger than 0.99
+    # default is the first items
+    all_joints_names = self.dlc_model_config[&#34;all_joints_names&#34;]
+    bodypart = all_joints_names[0]
+    if &#34;nose&#34; in all_joints_names:
+        bodypart = &#34;nose&#34;
+    elif &#34;center&#34; in all_joints_names:
+        bodypart = &#34;center&#34;
+
+    rolling_window = &#34;5s&#34;
+    df_MVA = raw[bodypart, &#34;likelihood&#34;].rolling(rolling_window).mean()
+    start = df_MVA[df_MVA &gt; 0.99].index.min()
+    # Time window for 10 minutes
+    end = start + timedelta(minutes=10)
+    raw = raw[start:end]
+    # set data to class instance
+    self.raw_data = raw</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.select_objects"><code class="name flex">
+<span>def <span class="ident">select_objects</span></span>(<span>self, num_of_objects: int = 2) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>select the roi object manually.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>num_of_objects</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>How many object to be selected. Defaults to 2.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select_objects(self, num_of_objects: int = 2) -&gt; None:
+    &#34;&#34;&#34;select the roi object manually.
+
+    Args:
+        num_of_objects (int, optional): How many object to be selected. Defaults to 2.
+    &#34;&#34;&#34;
+    self.objects = setrois(self.video_path, num_of_objects)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pyDLCbehavior.dataset.DLCDataset.load_csv" href="dataset.html#pyDLCbehavior.dataset.DLCDataset.load_csv">load_csv</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis"><code class="flex name class">
+<span>class <span class="ident">YMazeAnalysis</span></span>
+<span>(</span><span>csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '', time: int = 8)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>YMazeAnalysis(csv_path: pathlib.Path, pkl_path: pathlib.Path, video_path: pathlib.Path = '', time: int = 8)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class YMazeAnalysis(DLCDataset):
+    # analysis time window
+    time: int = 8
+    savedir: Path = field(init=False)
+
+    # scale parameters
+    scale_x: float = field(init=False, default=1)
+    scale_y: float = field(init=False, default=1)
+
+    # data after analysis
+    labeled_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    arms: ArmCollection = field(init=False, default_factory=ArmCollection)
+    ymaze_center: np.ndarray = field(init=False, repr=False, default=None)
+    alternation_data: Dict[str, Any] = field(
+        init=False, repr=False, default_factory=dict
+    )
+
+    # the summary from center trajectory
+    locomotion_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    total_distance: float = field(init=False, default=None)
+    mean_speed: float = field(init=False, default=None)
+
+    def __post_init__(self) -&gt; None:
+        super().__post_init__()
+        self.savedir = self.homedir.joinpath(&#34;save&#34;, f&#34;{self.time}min&#34;)
+        if not self.savedir.exists():
+            self.savedir.mkdir(parents=True)
+        self.preprocess()
+
+    def __setstate__(self, d: Mapping[str, Any]) -&gt; None:
+        super().__setstate__(d)
+        self.savedir = self.homedir.joinpath(&#34;save&#34;, f&#34;{self.time}min&#34;)
+        self.analyze()
+
+    def __getstate__(self) -&gt; Dict[str, Any]:
+        d = super().__getstate__()
+        d.update({&#34;time&#34;: self.time, &#34;arms&#34;: self.arms})
+        return d
+
+    def preprocess(self) -&gt; None:
+        raw = self.raw_data.droplevel(0, axis=1)
+        # Rolling the data by 5 seconds to get the reliable start time.
+        # Using nose as target to calculate the rolling mean of likelihood
+        # Get the index when mean of likelihood is larger than 0.99
+        # default is the first items
+        rolling_window = &#34;3s&#34;
+        nose_MVA = raw[&#34;Nose&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        withers_MVA = raw[&#34;Withers&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+        start = raw[(nose_MVA &gt; 0.95) &amp; (withers_MVA &gt; 0.95)].index.min()
+        # Time window for 8 minutes
+        end = start + timedelta(minutes=self.time)
+        raw = raw[start:end]
+        # set filter data to raw_data
+        self.raw_data = raw
+
+    def analyze(self):
+        # copy data
+        data = self.raw_data.copy()
+        # index slice
+        idx = pd.IndexSlice
+
+        # filter the data by distance from nose to withers
+        nose2wither = np.sqrt(
+            np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;x&#34;]]))
+            + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
+        )
+        data = data[nose2wither &lt; np.square(100)]
+
+        arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
+        ref_pt = []
+        #temp_arms = ArmCollection()
+        for a in arm_tags:
+            name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
+            mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
+            xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
+            arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+            ref_pt.append(arm_center)
+
+        # fit the abstract arm by DeepLabCut coordinates
+        arms: ArmCollection = BasicYMazeCollection()
+        arms.fit(ref_pt)
+
+        # mean pos_x, pos_y
+        middle_body_pos = (data.Nose[[&#34;x&#34;, &#34;y&#34;]] + data.Withers[[&#34;x&#34;, &#34;y&#34;]]) / 2
+
+        data[&#34;mask&#34;] = &#34;undefined&#34;
+        for arm in arms.values():
+            mask = middle_body_pos.apply(lambda pt: arm.contains(pt.x, pt.y), axis=1)
+            data.loc[mask, &#34;mask&#34;] = arm.name
+
+        ymaze_center = arms.center
+        calc_dist2center = lambda pt: np.square(pt - ymaze_center).sum() &lt; np.square(
+            100
+        )
+        mask = middle_body_pos.apply(calc_dist2center, axis=1, raw=True)
+        data.loc[mask, &#34;mask&#34;] = &#34;o&#34;
+
+        ###################################################
+        # Get the property of locomotor activity.
+        # Length x between center and mean point of arm1 and 2 is around 40 cm * sqrt(3) / 2
+        # Lenght y between center and mean point of arm1 and 2 is around 40 cm * 1 / 2
+        # Total distance is calculated following ARIMA model (moving average)
+        ###################################################
+
+        xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
+
+        scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
+        
+        withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+
+        # Set the rolling time window as 5
+        rolling_window = &#34;5s&#34;
+        withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
+        
+        scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
+        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        self.scale_x = abs(pt1[0] - pt2[0])
+        self.scale_y = abs(pt1[1] - pt2[1])
+
+        withers[[&#34;x&#34;, &#34;y&#34;]] = scaler.scale(withers.values)
+        # withers[&#34;x&#34;] = withers[&#34;x&#34;] * scale_x
+        # withers[&#34;y&#34;] = withers[&#34;y&#34;] * scale_y
+
+        withers[&#34;length&#34;] = np.sqrt(np.square(withers.diff()).sum(axis=1))
+        withers[&#34;distance&#34;] = withers[&#34;length&#34;].cumsum()
+        # delta time
+        dt = withers.index[1:] - withers.index[:-1]
+        # convert nsdeltatime to seconds
+        dt = dt.to_numpy().astype(float) / 1e9
+        withers[&#34;speed&#34;] = np.nan
+        withers[&#34;speed&#34;].iloc[1:] = withers[&#34;length&#34;].iloc[1:] / dt
+
+        self.locomotion_data = withers
+        self.total_distance = withers[&#34;length&#34;].sum()
+        self.mean_speed = withers[&#34;speed&#34;].mean()
+
+        self.ymaze_center = ymaze_center
+        self.arms = arms
+        self.labeled_data = data
+
+        # analysis the alternation
+        self.analyze_alternation()
+
+    def analyze_alternation(self):
+        data = self.labeled_data
+        labels = data[&#34;mask&#34;].copy()
+        start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+        labels = labels.loc[start:]
+        labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+        labels = labels.ffill()
+        labels.index.name = &#34;time&#34;
+        onset = (
+            labels[labels != labels.shift(1)]
+            .reset_index()
+            .rename(columns={&#34;mask&#34;: &#34;onset&#34;, &#34;time&#34;: &#34;onset_time&#34;})
+        )
+        offset = (
+            labels[labels != labels.shift(-1)]
+            .reset_index()
+            .rename(columns={&#34;mask&#34;: &#34;offset&#34;, &#34;time&#34;: &#34;offset_time&#34;})
+        )
+
+        alt_df = pd.concat([onset, offset], axis=1)
+        alt_df[&#34;duration&#34;] = alt_df[&#34;offset_time&#34;] - alt_df[&#34;onset_time&#34;]
+        total_row = len(alt_df)
+        num_of_arms = (alt_df.onset != &#34;o&#34;).sum()
+        #### Fetch the alternation, which is the count of arm entries that a mouse does not entry in the same arm over 3 entries.
+        #### Compared to next 2 entries.
+        arm_label = alt_df[alt_df.onset != &#34;o&#34;].onset
+
+        alt_mask = (
+            (arm_label != arm_label.shift(-1))
+            &amp; (arm_label != arm_label.shift(-2))
+            &amp; (arm_label.shift(-1) != arm_label.shift(-2))
+        )
+        alt = alt_mask.sum()
+        # Alternation ratio calculation
+        alternation_ratio = alt / (num_of_arms - 2) * 100
+        alternation_ratio = np.round(alternation_ratio, 3)
+
+        # Store each varibale in alt_dict
+        alternation_data = {
+            &#34;spontaneous_alternation&#34;: alt,  # Spontaneous_alternation
+            &#34;alternation_ratio&#34;: alternation_ratio,  # Alternation_ratio
+            &#34;arm_entries&#34;: num_of_arms,  # Arm_entries
+            &#34;alternation_order&#34;: alt_df,
+        }
+        self.alternation_data = alternation_data
+
+    def plot_ymaze(self) -&gt; mpl.figure.Figure:
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        data = self.labeled_data
+        withers = data[&#34;Withers&#34;]
+        ax.plot(withers.x, withers.y, alpha=0.2)
+
+        import re
+        from itertools import cycle
+
+        colors = str(plt.rcParams[&#34;axes.prop_cycle&#34;])
+        colors = cycle(
+            map(lambda s: s.strip(&#34; &#39;&#34;), re.findall(r&#34;&#39;#.*&#39;&#34;, colors)[0].split(&#34;,&#34;))
+        )
+        [next(colors) for _ in range(2)]
+
+        for arm, c in zip(self.arms.values(), colors):
+            ax.text(*arm.center, arm.name, size=12)
+            arm.draw_area(ax, facecolor=c + &#34;70&#34;, zorder=2)
+        ax.scatter(*self.ymaze_center, c=&#34;red&#34;)
+
+        for label in [&#34;o&#34;, &#34;A&#34;, &#34;B&#34;, &#34;C&#34;]:
+            filter_withers = data.loc[data[&#34;mask&#34;] == label, &#34;Withers&#34;]
+            ax.plot(filter_withers.x, filter_withers.y)
+
+        self.arms.draw_contour(ax, facecolor=&#34;0.9&#34;, edgecolor=&#34;0.5&#34;)
+
+        width, height = self.frame_dimensions
+        ax.set_xlim(0, width)
+        ax.set_ylim(height, 0)
+        filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+        ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.savedir.joinpath(f&#34;{filename}_Ymaze_apperance_{self.time}.png&#34;)
+        )
+        return fig
+
+    def plot_alternations(self) -&gt; mpl.figure.Figure:
+        data = self.labeled_data
+        labels = data[&#34;mask&#34;].copy()
+        start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+        labels = labels.loc[start:]
+        labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+        labels = labels.ffill()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        from collections import defaultdict
+
+        dic = defaultdict(lambda: 5, A=1, B=2, C=3, o=4)
+
+        label_nums = labels.replace(dic)
+        ax.plot(label_nums)
+        ax.plot(label_nums.diff())
+        # set labels
+        group_labels = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;Center&#34;, &#34;Others&#34;]
+        ax.set_yticks([1, 2, 3, 4, 5])
+        ax.set_yticklabels(group_labels)
+        ax.set_ylim(0, 6)
+        filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+        ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+        fig.tight_layout()
+        fig.savefig(
+            self.savedir.joinpath(f&#34;{filename}_Ymaze_alternation_{self.time}min.png&#34;)
+        )
+        return fig
+
+    @property
+    def summary_df(self) -&gt; pd.DataFrame:
+        return pd.DataFrame.from_dict(
+            OrderedDict(
+                filename=[self.csv_path.stem],
+                video_shape=[self.frame_dimensions],
+                video_fps=[self.FPS],
+                arm_entries=[self.alternation_data[&#34;arm_entries&#34;]],
+                spontaneous_alternation=[
+                    self.alternation_data[&#34;spontaneous_alternation&#34;]
+                ],
+                total_distance=[self.total_distance],
+                mean_speed=[self.mean_speed],
+            )
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.alternation_data"><code class="name">var <span class="ident">alternation_data</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.arms"><code class="name">var <span class="ident">arms</span> : <a title="pyDLCbehavior.ymaze.ArmCollection" href="ymaze.html#pyDLCbehavior.ymaze.ArmCollection">ArmCollection</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.labeled_data"><code class="name">var <span class="ident">labeled_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.locomotion_data"><code class="name">var <span class="ident">locomotion_data</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.mean_speed"><code class="name">var <span class="ident">mean_speed</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.savedir"><code class="name">var <span class="ident">savedir</span> : pathlib.Path</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.scale_x"><code class="name">var <span class="ident">scale_x</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.scale_y"><code class="name">var <span class="ident">scale_y</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.time"><code class="name">var <span class="ident">time</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.total_distance"><code class="name">var <span class="ident">total_distance</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.ymaze_center"><code class="name">var <span class="ident">ymaze_center</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.summary_df"><code class="name">var <span class="ident">summary_df</span> : pandas.core.frame.DataFrame</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def summary_df(self) -&gt; pd.DataFrame:
+    return pd.DataFrame.from_dict(
+        OrderedDict(
+            filename=[self.csv_path.stem],
+            video_shape=[self.frame_dimensions],
+            video_fps=[self.FPS],
+            arm_entries=[self.alternation_data[&#34;arm_entries&#34;]],
+            spontaneous_alternation=[
+                self.alternation_data[&#34;spontaneous_alternation&#34;]
+            ],
+            total_distance=[self.total_distance],
+            mean_speed=[self.mean_speed],
+        )
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.analyze"><code class="name flex">
+<span>def <span class="ident">analyze</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze(self):
+    # copy data
+    data = self.raw_data.copy()
+    # index slice
+    idx = pd.IndexSlice
+
+    # filter the data by distance from nose to withers
+    nose2wither = np.sqrt(
+        np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;x&#34;]]))
+        + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
+    )
+    data = data[nose2wither &lt; np.square(100)]
+
+    arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
+    ref_pt = []
+    #temp_arms = ArmCollection()
+    for a in arm_tags:
+        name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
+        mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
+        xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
+        arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+        ref_pt.append(arm_center)
+
+    # fit the abstract arm by DeepLabCut coordinates
+    arms: ArmCollection = BasicYMazeCollection()
+    arms.fit(ref_pt)
+
+    # mean pos_x, pos_y
+    middle_body_pos = (data.Nose[[&#34;x&#34;, &#34;y&#34;]] + data.Withers[[&#34;x&#34;, &#34;y&#34;]]) / 2
+
+    data[&#34;mask&#34;] = &#34;undefined&#34;
+    for arm in arms.values():
+        mask = middle_body_pos.apply(lambda pt: arm.contains(pt.x, pt.y), axis=1)
+        data.loc[mask, &#34;mask&#34;] = arm.name
+
+    ymaze_center = arms.center
+    calc_dist2center = lambda pt: np.square(pt - ymaze_center).sum() &lt; np.square(
+        100
+    )
+    mask = middle_body_pos.apply(calc_dist2center, axis=1, raw=True)
+    data.loc[mask, &#34;mask&#34;] = &#34;o&#34;
+
+    ###################################################
+    # Get the property of locomotor activity.
+    # Length x between center and mean point of arm1 and 2 is around 40 cm * sqrt(3) / 2
+    # Lenght y between center and mean point of arm1 and 2 is around 40 cm * 1 / 2
+    # Total distance is calculated following ARIMA model (moving average)
+    ###################################################
+
+    xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
+
+    scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
+    
+    withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
+
+    # Set the rolling time window as 5
+    rolling_window = &#34;5s&#34;
+    withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
+    
+    scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
+    pt1, pt2 = scaler.scale([(1,1), (0,0)])
+    self.scale_x = abs(pt1[0] - pt2[0])
+    self.scale_y = abs(pt1[1] - pt2[1])
+
+    withers[[&#34;x&#34;, &#34;y&#34;]] = scaler.scale(withers.values)
+    # withers[&#34;x&#34;] = withers[&#34;x&#34;] * scale_x
+    # withers[&#34;y&#34;] = withers[&#34;y&#34;] * scale_y
+
+    withers[&#34;length&#34;] = np.sqrt(np.square(withers.diff()).sum(axis=1))
+    withers[&#34;distance&#34;] = withers[&#34;length&#34;].cumsum()
+    # delta time
+    dt = withers.index[1:] - withers.index[:-1]
+    # convert nsdeltatime to seconds
+    dt = dt.to_numpy().astype(float) / 1e9
+    withers[&#34;speed&#34;] = np.nan
+    withers[&#34;speed&#34;].iloc[1:] = withers[&#34;length&#34;].iloc[1:] / dt
+
+    self.locomotion_data = withers
+    self.total_distance = withers[&#34;length&#34;].sum()
+    self.mean_speed = withers[&#34;speed&#34;].mean()
+
+    self.ymaze_center = ymaze_center
+    self.arms = arms
+    self.labeled_data = data
+
+    # analysis the alternation
+    self.analyze_alternation()</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.analyze_alternation"><code class="name flex">
+<span>def <span class="ident">analyze_alternation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze_alternation(self):
+    data = self.labeled_data
+    labels = data[&#34;mask&#34;].copy()
+    start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+    labels = labels.loc[start:]
+    labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+    labels = labels.ffill()
+    labels.index.name = &#34;time&#34;
+    onset = (
+        labels[labels != labels.shift(1)]
+        .reset_index()
+        .rename(columns={&#34;mask&#34;: &#34;onset&#34;, &#34;time&#34;: &#34;onset_time&#34;})
+    )
+    offset = (
+        labels[labels != labels.shift(-1)]
+        .reset_index()
+        .rename(columns={&#34;mask&#34;: &#34;offset&#34;, &#34;time&#34;: &#34;offset_time&#34;})
+    )
+
+    alt_df = pd.concat([onset, offset], axis=1)
+    alt_df[&#34;duration&#34;] = alt_df[&#34;offset_time&#34;] - alt_df[&#34;onset_time&#34;]
+    total_row = len(alt_df)
+    num_of_arms = (alt_df.onset != &#34;o&#34;).sum()
+    #### Fetch the alternation, which is the count of arm entries that a mouse does not entry in the same arm over 3 entries.
+    #### Compared to next 2 entries.
+    arm_label = alt_df[alt_df.onset != &#34;o&#34;].onset
+
+    alt_mask = (
+        (arm_label != arm_label.shift(-1))
+        &amp; (arm_label != arm_label.shift(-2))
+        &amp; (arm_label.shift(-1) != arm_label.shift(-2))
+    )
+    alt = alt_mask.sum()
+    # Alternation ratio calculation
+    alternation_ratio = alt / (num_of_arms - 2) * 100
+    alternation_ratio = np.round(alternation_ratio, 3)
+
+    # Store each varibale in alt_dict
+    alternation_data = {
+        &#34;spontaneous_alternation&#34;: alt,  # Spontaneous_alternation
+        &#34;alternation_ratio&#34;: alternation_ratio,  # Alternation_ratio
+        &#34;arm_entries&#34;: num_of_arms,  # Arm_entries
+        &#34;alternation_order&#34;: alt_df,
+    }
+    self.alternation_data = alternation_data</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.plot_alternations"><code class="name flex">
+<span>def <span class="ident">plot_alternations</span></span>(<span>self) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_alternations(self) -&gt; mpl.figure.Figure:
+    data = self.labeled_data
+    labels = data[&#34;mask&#34;].copy()
+    start = labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;]).index.min()
+    labels = labels.loc[start:]
+    labels[~labels.isin([&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;o&#34;])] = np.nan
+    labels = labels.ffill()
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    from collections import defaultdict
+
+    dic = defaultdict(lambda: 5, A=1, B=2, C=3, o=4)
+
+    label_nums = labels.replace(dic)
+    ax.plot(label_nums)
+    ax.plot(label_nums.diff())
+    # set labels
+    group_labels = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;Center&#34;, &#34;Others&#34;]
+    ax.set_yticks([1, 2, 3, 4, 5])
+    ax.set_yticklabels(group_labels)
+    ax.set_ylim(0, 6)
+    filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+    ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+    fig.tight_layout()
+    fig.savefig(
+        self.savedir.joinpath(f&#34;{filename}_Ymaze_alternation_{self.time}min.png&#34;)
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.plot_ymaze"><code class="name flex">
+<span>def <span class="ident">plot_ymaze</span></span>(<span>self) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_ymaze(self) -&gt; mpl.figure.Figure:
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111)
+    data = self.labeled_data
+    withers = data[&#34;Withers&#34;]
+    ax.plot(withers.x, withers.y, alpha=0.2)
+
+    import re
+    from itertools import cycle
+
+    colors = str(plt.rcParams[&#34;axes.prop_cycle&#34;])
+    colors = cycle(
+        map(lambda s: s.strip(&#34; &#39;&#34;), re.findall(r&#34;&#39;#.*&#39;&#34;, colors)[0].split(&#34;,&#34;))
+    )
+    [next(colors) for _ in range(2)]
+
+    for arm, c in zip(self.arms.values(), colors):
+        ax.text(*arm.center, arm.name, size=12)
+        arm.draw_area(ax, facecolor=c + &#34;70&#34;, zorder=2)
+    ax.scatter(*self.ymaze_center, c=&#34;red&#34;)
+
+    for label in [&#34;o&#34;, &#34;A&#34;, &#34;B&#34;, &#34;C&#34;]:
+        filter_withers = data.loc[data[&#34;mask&#34;] == label, &#34;Withers&#34;]
+        ax.plot(filter_withers.x, filter_withers.y)
+
+    self.arms.draw_contour(ax, facecolor=&#34;0.9&#34;, edgecolor=&#34;0.5&#34;)
+
+    width, height = self.frame_dimensions
+    ax.set_xlim(0, width)
+    ax.set_ylim(height, 0)
+    filename = self.csv_path.stem.split(&#34;_&#34;)[0]
+    ax.set_title(f&#34;Ymaze appearance {filename}&#34;)
+    fig.tight_layout()
+    fig.savefig(
+        self.savedir.joinpath(f&#34;{filename}_Ymaze_apperance_{self.time}.png&#34;)
+    )
+    return fig</code></pre>
+</details>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.preprocess"><code class="name flex">
+<span>def <span class="ident">preprocess</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess(self) -&gt; None:
+    raw = self.raw_data.droplevel(0, axis=1)
+    # Rolling the data by 5 seconds to get the reliable start time.
+    # Using nose as target to calculate the rolling mean of likelihood
+    # Get the index when mean of likelihood is larger than 0.99
+    # default is the first items
+    rolling_window = &#34;3s&#34;
+    nose_MVA = raw[&#34;Nose&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+    withers_MVA = raw[&#34;Withers&#34;, &#34;likelihood&#34;].rolling(rolling_window).mean()
+    start = raw[(nose_MVA &gt; 0.95) &amp; (withers_MVA &gt; 0.95)].index.min()
+    # Time window for 8 minutes
+    end = start + timedelta(minutes=self.time)
+    raw = raw[start:end]
+    # set filter data to raw_data
+    self.raw_data = raw</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pyDLCbehavior.dataset.DLCDataset" href="dataset.html#pyDLCbehavior.dataset.DLCDataset">DLCDataset</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pyDLCbehavior.dataset.DLCDataset.load_csv" href="dataset.html#pyDLCbehavior.dataset.DLCDataset.load_csv">load_csv</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pyDLCbehavior" href="index.html">pyDLCbehavior</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis">NovelObjectRecognitionAnalysis</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.add_object" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.add_object">add_object</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.analyze" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.analyze">analyze</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.climbing_filter" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.climbing_filter">climbing_filter</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.data" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.data">data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.filter_data" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.filter_data">filter_data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.locomotion_data" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.locomotion_data">locomotion_data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.mean_speed" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.mean_speed">mean_speed</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.nose2obj" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.nose2obj">nose2obj</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.num_of_objects" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.num_of_objects">num_of_objects</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.object_a" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.object_a">object_a</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.object_b" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.object_b">object_b</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.objects" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.objects">objects</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.offset" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.offset">offset</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_filter_scatter" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_filter_scatter">plot_filter_scatter</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_heatmap" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_heatmap">plot_heatmap</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_trajectory" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.plot_trajectory">plot_trajectory</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.preprocess" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.preprocess">preprocess</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.raw_data" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.raw_data">raw_data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.scale_x" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.scale_x">scale_x</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.scale_y" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.scale_y">scale_y</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.select_objects" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.select_objects">select_objects</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.summary_df" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.summary_df">summary_df</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.total_distance" href="#pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.total_distance">total_distance</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pyDLCbehavior.analysis.YMazeAnalysis" href="#pyDLCbehavior.analysis.YMazeAnalysis">YMazeAnalysis</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.alternation_data" href="#pyDLCbehavior.analysis.YMazeAnalysis.alternation_data">alternation_data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.analyze" href="#pyDLCbehavior.analysis.YMazeAnalysis.analyze">analyze</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.analyze_alternation" href="#pyDLCbehavior.analysis.YMazeAnalysis.analyze_alternation">analyze_alternation</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.arms" href="#pyDLCbehavior.analysis.YMazeAnalysis.arms">arms</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.labeled_data" href="#pyDLCbehavior.analysis.YMazeAnalysis.labeled_data">labeled_data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.locomotion_data" href="#pyDLCbehavior.analysis.YMazeAnalysis.locomotion_data">locomotion_data</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.mean_speed" href="#pyDLCbehavior.analysis.YMazeAnalysis.mean_speed">mean_speed</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.plot_alternations" href="#pyDLCbehavior.analysis.YMazeAnalysis.plot_alternations">plot_alternations</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.plot_ymaze" href="#pyDLCbehavior.analysis.YMazeAnalysis.plot_ymaze">plot_ymaze</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.preprocess" href="#pyDLCbehavior.analysis.YMazeAnalysis.preprocess">preprocess</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.savedir" href="#pyDLCbehavior.analysis.YMazeAnalysis.savedir">savedir</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.scale_x" href="#pyDLCbehavior.analysis.YMazeAnalysis.scale_x">scale_x</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.scale_y" href="#pyDLCbehavior.analysis.YMazeAnalysis.scale_y">scale_y</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.summary_df" href="#pyDLCbehavior.analysis.YMazeAnalysis.summary_df">summary_df</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.time" href="#pyDLCbehavior.analysis.YMazeAnalysis.time">time</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.total_distance" href="#pyDLCbehavior.analysis.YMazeAnalysis.total_distance">total_distance</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.ymaze_center" href="#pyDLCbehavior.analysis.YMazeAnalysis.ymaze_center">ymaze_center</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
