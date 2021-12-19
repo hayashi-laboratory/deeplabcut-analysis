@@ -5,6 +5,8 @@ from typing import Dict, List, Mapping, OrderedDict
 import cv2
 from numpy import ndarray
 
+__all__ = ["Roi", "setrois", "glob_files"]
+
 
 @dataclass
 class Roi:

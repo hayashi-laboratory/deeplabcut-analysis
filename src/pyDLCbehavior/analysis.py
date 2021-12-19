@@ -14,6 +14,8 @@ from .utility import Roi, setrois
 from .ymaze import ArmCollection, ArmRegion, BasicYMazeCollection, YMazeScaler
 
 
+__all__ = ["NovelObjectRecognitionAnalysis", "YMazeAnalysis"]
+
 @dataclass
 class NovelObjectRecognitionAnalysis(DLCDataset):
 
