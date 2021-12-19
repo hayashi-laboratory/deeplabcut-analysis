@@ -132,3 +132,5 @@ dmypy.json
 
 data/
 *.svg
+templates/
+html/
