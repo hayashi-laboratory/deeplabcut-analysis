@@ -10,9 +10,10 @@ conda activate your_env_name
 
 - create a venv in the directory your want 
 - It will create a .venv folder in your enviornment
+ > https://code.visualstudio.com/docs/python/python-tutorial
 ```
 conda activate your_env_name
-python3.9 -m venv .venv
+py -3 -m venv .venv
 ```
 
 - Activate the enviroment
