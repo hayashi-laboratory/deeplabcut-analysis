@@ -20,8 +20,8 @@ py -3 -m venv .venv
 - - for windows
 ```
 source ./.venv/Scripts/activate
-python3.9 -m pip install -U -r requirements.txt
-python3.9 -m pip install .
+python -m pip install -U -r requirements.txt
+python -m pip install .
 ```
 
 - - for Linux/MacOs
