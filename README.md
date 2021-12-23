@@ -32,3 +32,8 @@ python3.9 -m pip install .
 ```
 
 
+## Add a kernel to jupyter lab 
+```
+pip install ipykernel
+python -m ipykernel install --user --name=your_env_name
+```
