@@ -8,7 +8,7 @@ conda create -n -y your_env_name python=3.9
 conda activate your_env_name
 ```
 
-- create a venv in the director your want 
+- create a venv in the directory your want 
 - It will create a .venv folder in your enviornment
 ```
 conda activate your_env_name
