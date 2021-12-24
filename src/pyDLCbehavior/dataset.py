@@ -96,6 +96,7 @@ class DLCDataset:
             FPS=self.FPS,
             frame_dimensions=self.frame_dimensions,
             raw_data=self.raw_data,
+            video_frame_cache = self.video_frame_cache,
         )
 
     def load_csv(self) -> None:
