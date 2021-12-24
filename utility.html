@@ -28,7 +28,7 @@
 </summary>
 <pre><code class="python">from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Mapping, OrderedDict
+from typing import Dict, List, Mapping, OrderedDict, Optional
 
 import cv2
 from numpy import ndarray
@@ -152,7 +152,7 @@ def glob_files(parent: Path) -&gt; Dict[str, List[Path]]:
     return path_dict
 
 
-def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
+def setrois(videopath: str=&#34;&#34;, num_of_objects: int=2, video_frame:Optional[ndarray] = None) -&gt; List[&#34;Roi&#34;]:
     &#34;&#34;&#34;Manual selection region of interest from video
 
     Args:
@@ -172,21 +172,23 @@ def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
     if not isinstance(videopath, Path):
         videopath = Path(videopath)
 
-    if not (videopath.exists() and videopath.is_file()):
-        raise FileNotFoundError(
-            f&#34;{videopath.name} is not existed. Please check your videopath&#34;
-        )
+    frame = video_frame
+    if not isinstance(video_frame, ndarray):
+        if not (videopath.exists() and videopath.is_file()):
+            raise FileNotFoundError(
+                f&#34;{videopath.name} is not existed. Please check your videopath&#34;
+            )
 
-    cap = cv2.VideoCapture(str(videopath))
+        cap = cv2.VideoCapture(str(videopath))
 
-    if not cap.isOpened():
-        raise FileNotFoundError(f&#34;Could not open the video {videopath.name}&#34;)
+        if not cap.isOpened():
+            raise FileNotFoundError(f&#34;Could not open the video {videopath.name}&#34;)
 
-    while True:
-        ok, frame = cap.read()
-        if ok:
-            break
-    cap.release()
+        while True:
+            ok, frame = cap.read()
+            if ok:
+                break
+        cap.release()
 
     windowname = videopath.name.split(&#34;_&#34;)[1]
     rois = []
@@ -289,7 +291,7 @@ def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
 </details>
 </dd>
 <dt id="pyDLCbehavior.utility.setrois"><code class="name flex">
-<span>def <span class="ident">setrois</span></span>(<span>videopath: str, num_of_objects: int) ‑> List[<a title="pyDLCbehavior.utility.Roi" href="#pyDLCbehavior.utility.Roi">Roi</a>]</span>
+<span>def <span class="ident">setrois</span></span>(<span>videopath: str = '', num_of_objects: int = 2, video_frame: Optional[numpy.ndarray] = None) ‑> List[<a title="pyDLCbehavior.utility.Roi" href="#pyDLCbehavior.utility.Roi">Roi</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Manual selection region of interest from video</p>
@@ -318,7 +320,7 @@ def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
+<pre><code class="python">def setrois(videopath: str=&#34;&#34;, num_of_objects: int=2, video_frame:Optional[ndarray] = None) -&gt; List[&#34;Roi&#34;]:
     &#34;&#34;&#34;Manual selection region of interest from video
 
     Args:
@@ -338,21 +340,23 @@ def setrois(videopath: str, num_of_objects: int) -&gt; List[&#34;Roi&#34;]:
     if not isinstance(videopath, Path):
         videopath = Path(videopath)
 
-    if not (videopath.exists() and videopath.is_file()):
-        raise FileNotFoundError(
-            f&#34;{videopath.name} is not existed. Please check your videopath&#34;
-        )
+    frame = video_frame
+    if not isinstance(video_frame, ndarray):
+        if not (videopath.exists() and videopath.is_file()):
+            raise FileNotFoundError(
+                f&#34;{videopath.name} is not existed. Please check your videopath&#34;
+            )
 
-    cap = cv2.VideoCapture(str(videopath))
+        cap = cv2.VideoCapture(str(videopath))
 
-    if not cap.isOpened():
-        raise FileNotFoundError(f&#34;Could not open the video {videopath.name}&#34;)
+        if not cap.isOpened():
+            raise FileNotFoundError(f&#34;Could not open the video {videopath.name}&#34;)
 
-    while True:
-        ok, frame = cap.read()
-        if ok:
-            break
-    cap.release()
+        while True:
+            ok, frame = cap.read()
+            if ok:
+                break
+        cap.release()
 
     windowname = videopath.name.split(&#34;_&#34;)[1]
     rois = []

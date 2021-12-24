@@ -56,8 +56,8 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
     scale_y: float = field(init=False, default=1)
 
     # data after analysis
-    nose2obj: int = field(init=False, default=None)
-    offset: int = field(init=False, default=None)
+    nose2obj: int = field(init=False, default=4)
+    offset: int = field(init=False, default=15)
     data: pd.DataFrame = field(init=False, repr=False, default=None)
     filter_data: pd.DataFrame = field(init=False, repr=False, default=None)
     climbing_filter: pd.DataFrame = field(init=False, repr=False, default=None)
@@ -111,7 +111,9 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         Args:
             num_of_objects (int, optional): How many object to be selected. Defaults to 2.
         &#34;&#34;&#34;
-        self.objects = setrois(self.video_path, num_of_objects)
+        if self.video_frame_cache is None:
+            self.read_video_frame()
+        self.objects = setrois(self.video_path, num_of_objects, self.video_frame_cache)
 
     def add_object(self, obj: Roi) -&gt; None:
         &#34;&#34;&#34;Add a Roi object manually.
@@ -151,13 +153,14 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         # set data to class instance
         self.raw_data = raw
 
-    def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+    def analyze(self, nose2obj: int = None, offset: int = None) -&gt; None:
         if self.num_of_objects == 0:
             print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
             return
+        # The nose2obj and offset can be overwrite by input arguments
+        self.nose2obj = nose2obj or self.nose2obj
+        self.offset = offset or self.offset
 
-        self.nose2obj = self.nose2obj or nose2obj
-        self.offset = self.offset or offset
         # copy the data from raw_data
         data = self.raw_data.copy()
 
@@ -219,7 +222,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
 
         # first filter all data by 15cm
         # offset default is 15 cm
-        filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+        filter_data = data[data[&#34;nose2center&#34;] &lt; self.offset]
 
         # took the center position
         center = (
@@ -239,7 +242,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
 
         for roi_obj in self.objects:
             name = roi_obj.name
-            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; self.nose2obj) &amp; ~(
                 filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
             )
             count = mask.sum()
@@ -252,8 +255,8 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         # filter the climbing data
         # select the nose is &lt; 4 cm and center  &gt; 4 cm
         filter_func = lambda roi_obj: (
-            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
-            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; self.nose2obj)
+            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; self.nose2obj)
         )
         # condition fit object A or object B
         distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
@@ -705,8 +708,8 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
     scale_y: float = field(init=False, default=1)
 
     # data after analysis
-    nose2obj: int = field(init=False, default=None)
-    offset: int = field(init=False, default=None)
+    nose2obj: int = field(init=False, default=4)
+    offset: int = field(init=False, default=15)
     data: pd.DataFrame = field(init=False, repr=False, default=None)
     filter_data: pd.DataFrame = field(init=False, repr=False, default=None)
     climbing_filter: pd.DataFrame = field(init=False, repr=False, default=None)
@@ -760,7 +763,9 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         Args:
             num_of_objects (int, optional): How many object to be selected. Defaults to 2.
         &#34;&#34;&#34;
-        self.objects = setrois(self.video_path, num_of_objects)
+        if self.video_frame_cache is None:
+            self.read_video_frame()
+        self.objects = setrois(self.video_path, num_of_objects, self.video_frame_cache)
 
     def add_object(self, obj: Roi) -&gt; None:
         &#34;&#34;&#34;Add a Roi object manually.
@@ -800,13 +805,14 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         # set data to class instance
         self.raw_data = raw
 
-    def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+    def analyze(self, nose2obj: int = None, offset: int = None) -&gt; None:
         if self.num_of_objects == 0:
             print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
             return
+        # The nose2obj and offset can be overwrite by input arguments
+        self.nose2obj = nose2obj or self.nose2obj
+        self.offset = offset or self.offset
 
-        self.nose2obj = self.nose2obj or nose2obj
-        self.offset = self.offset or offset
         # copy the data from raw_data
         data = self.raw_data.copy()
 
@@ -868,7 +874,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
 
         # first filter all data by 15cm
         # offset default is 15 cm
-        filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+        filter_data = data[data[&#34;nose2center&#34;] &lt; self.offset]
 
         # took the center position
         center = (
@@ -888,7 +894,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
 
         for roi_obj in self.objects:
             name = roi_obj.name
-            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+            mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; self.nose2obj) &amp; ~(
                 filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
             )
             count = mask.sum()
@@ -901,8 +907,8 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         # filter the climbing data
         # select the nose is &lt; 4 cm and center  &gt; 4 cm
         filter_func = lambda roi_obj: (
-            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
-            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+            (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; self.nose2obj)
+            &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; self.nose2obj)
         )
         # condition fit object A or object B
         distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
@@ -1207,7 +1213,7 @@ def summary_df(self) -&gt; pd.DataFrame:
 </details>
 </dd>
 <dt id="pyDLCbehavior.analysis.NovelObjectRecognitionAnalysis.analyze"><code class="name flex">
-<span>def <span class="ident">analyze</span></span>(<span>self, nose2obj: int = 4, offset: int = 15) ‑> None</span>
+<span>def <span class="ident">analyze</span></span>(<span>self, nose2obj: int = None, offset: int = None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1215,13 +1221,14 @@ def summary_df(self) -&gt; pd.DataFrame:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def analyze(self, nose2obj: int = 4, offset: int = 15) -&gt; None:
+<pre><code class="python">def analyze(self, nose2obj: int = None, offset: int = None) -&gt; None:
     if self.num_of_objects == 0:
         print(&#34;\033]91mPlease select objects before analyze\033]0m&#34;)
         return
+    # The nose2obj and offset can be overwrite by input arguments
+    self.nose2obj = nose2obj or self.nose2obj
+    self.offset = offset or self.offset
 
-    self.nose2obj = self.nose2obj or nose2obj
-    self.offset = self.offset or offset
     # copy the data from raw_data
     data = self.raw_data.copy()
 
@@ -1283,7 +1290,7 @@ def summary_df(self) -&gt; pd.DataFrame:
 
     # first filter all data by 15cm
     # offset default is 15 cm
-    filter_data = data[data[&#34;nose2center&#34;] &lt; offset]
+    filter_data = data[data[&#34;nose2center&#34;] &lt; self.offset]
 
     # took the center position
     center = (
@@ -1303,7 +1310,7 @@ def summary_df(self) -&gt; pd.DataFrame:
 
     for roi_obj in self.objects:
         name = roi_obj.name
-        mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; nose2obj) &amp; ~(
+        mask = (filter_data[&#34;nose&#34;, f&#34;distance_to_{name}&#34;] &lt; self.nose2obj) &amp; ~(
             filter_data[&#34;center&#34;, f&#34;distance_to_{name}&#34;].isnull()
         )
         count = mask.sum()
@@ -1316,8 +1323,8 @@ def summary_df(self) -&gt; pd.DataFrame:
     # filter the climbing data
     # select the nose is &lt; 4 cm and center  &gt; 4 cm
     filter_func = lambda roi_obj: (
-        (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; nose2obj)
-        &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; nose2obj)
+        (filter_data[f&#34;nose&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &lt; self.nose2obj)
+        &amp; (filter_data[&#34;center&#34;, f&#34;distance_to_{roi_obj.name}&#34;] &gt; self.nose2obj)
     )
     # condition fit object A or object B
     distance_mask = filter_func(self.objects[0]) | filter_func(self.objects[1])
@@ -1491,7 +1498,9 @@ def summary_df(self) -&gt; pd.DataFrame:
     Args:
         num_of_objects (int, optional): How many object to be selected. Defaults to 2.
     &#34;&#34;&#34;
-    self.objects = setrois(self.video_path, num_of_objects)</code></pre>
+    if self.video_frame_cache is None:
+        self.read_video_frame()
+    self.objects = setrois(self.video_path, num_of_objects, self.video_frame_cache)</code></pre>
 </details>
 </dd>
 </dl>
