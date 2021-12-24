@@ -144,7 +144,6 @@ def setrois(videopath: str="", num_of_objects: int=2, video_frame:Optional[ndarr
     if not isinstance(videopath, Path):
         videopath = Path(videopath)
 
-    frame = video_frame
     if not isinstance(video_frame, ndarray):
         if not (videopath.exists() and videopath.is_file()):
             raise FileNotFoundError(
@@ -161,6 +160,8 @@ def setrois(videopath: str="", num_of_objects: int=2, video_frame:Optional[ndarr
             if ok:
                 break
         cap.release()
+    else:
+        frame = video_frame.copy()
 
     windowname = videopath.name.split("_")[1]
     rois = []
