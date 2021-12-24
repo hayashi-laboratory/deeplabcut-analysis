@@ -37,3 +37,8 @@ python3.9 -m pip install .
 pip install ipykernel
 python -m ipykernel install --user --name=your_env_name
 ```
+
+## Add other kernel to current kernel (Both environment need ipykernel installed)
+```
+/path/to/kernel/env/bin/python -m ipykernel install --prefix=/path/to/jupyter/env --name 'python-my-env'
+```
