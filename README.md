@@ -32,11 +32,6 @@ python3.9 -m pip install .
 ```
 
 
-- Install using wheel file
-
-```
-python3.9 -m pip install pyDLCbehavior-0.1.0-py3-none-any.whl
-```
 
 
 ## Add a kernel to jupyter lab 
