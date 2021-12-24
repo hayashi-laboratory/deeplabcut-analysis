@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Mapping, OrderedDict
+from typing import Dict, List, Mapping, OrderedDict, Optional
 
 import cv2
 from numpy import ndarray
@@ -124,7 +124,7 @@ def glob_files(parent: Path) -> Dict[str, List[Path]]:
     return path_dict
 
 
-def setrois(videopath: str, num_of_objects: int) -> List["Roi"]:
+def setrois(videopath: str="", num_of_objects: int=2, video_frame:Optional[ndarray] = None) -> List["Roi"]:
     """Manual selection region of interest from video
 
     Args:
@@ -144,21 +144,23 @@ def setrois(videopath: str, num_of_objects: int) -> List["Roi"]:
     if not isinstance(videopath, Path):
         videopath = Path(videopath)
 
-    if not (videopath.exists() and videopath.is_file()):
-        raise FileNotFoundError(
-            f"{videopath.name} is not existed. Please check your videopath"
-        )
+    frame = video_frame
+    if not isinstance(video_frame, ndarray):
+        if not (videopath.exists() and videopath.is_file()):
+            raise FileNotFoundError(
+                f"{videopath.name} is not existed. Please check your videopath"
+            )
 
-    cap = cv2.VideoCapture(str(videopath))
+        cap = cv2.VideoCapture(str(videopath))
 
-    if not cap.isOpened():
-        raise FileNotFoundError(f"Could not open the video {videopath.name}")
+        if not cap.isOpened():
+            raise FileNotFoundError(f"Could not open the video {videopath.name}")
 
-    while True:
-        ok, frame = cap.read()
-        if ok:
-            break
-    cap.release()
+        while True:
+            ok, frame = cap.read()
+            if ok:
+                break
+        cap.release()
 
     windowname = videopath.name.split("_")[1]
     rois = []

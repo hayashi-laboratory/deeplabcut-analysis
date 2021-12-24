@@ -1,8 +1,11 @@
-from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, Any, Mapping, Union, NamedTuple
 from datetime import timedelta
+from pathlib import Path
+from typing import Any, Dict, Mapping, NamedTuple, Optional, Union
+
+import cv2
 import pandas as pd
+from numpy import ndarray
 
 __all__ = ["DLCDataset", "FrameDimension"]
 
@@ -29,6 +32,7 @@ class DLCDataset:
 
     # raw_data
     raw_data: pd.DataFrame = field(init=False, repr=False, default=None)
+    video_frame_cache: Optional[ndarray] =  field(init=False, repr =False, default = None)
 
     def __post_init__(self):
         # convert all path to patlib.Path
@@ -47,7 +51,6 @@ class DLCDataset:
         if "DLC-model-config file" in data:
             self.dlc_model_config = data["DLC-model-config file"]
             del data["DLC-model-config file"]
-
         # load the video data from data
         self.FPS = data.get("fps")
 
@@ -55,6 +58,10 @@ class DLCDataset:
 
         self.frame_dimensions = FrameDimension(width, height)
         self.hyperparams = data
+
+        # read a video frame and store as cache if video exists()
+        self.read_video_frame()
+        # load csv file
         self.load_csv()
 
     def __setstate__(self, d: Mapping[str, Any]) -> None:
@@ -122,3 +129,20 @@ class DLCDataset:
         if not Path(pickle_path).exists():
             raise FileNotFoundError(str(pickle_path))
         return pd.read_pickle(Path(pickle_path))
+
+
+    def read_video_frame(self) ->None:
+        if not (self.video_path.exists() and self.video_path.is_file()):
+            return
+        try:
+            cap = cv2.VideoCapture(str(self.video_path))
+            if not cap.isOpened():
+                return
+            # read 10 frame for cache video frame
+            for _ in range(10):
+                ok, frame = cap.read()
+                if ok:
+                    self.video_frame_cache = frame
+                    break
+        finally:
+            cap.release()
