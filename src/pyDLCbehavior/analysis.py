@@ -16,6 +16,7 @@ from .ymaze import ArmCollection, ArmRegion, BasicYMazeCollection, YMazeScaler
 
 __all__ = ["NovelObjectRecognitionAnalysis", "YMazeAnalysis"]
 
+
 @dataclass
 class NovelObjectRecognitionAnalysis(DLCDataset):
 
@@ -322,6 +323,9 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         im = ax.imshow(counts, cmap=cmap)
         # create an axes on the right side of ax. The width of cax will be 5%
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        width, height = counts.shape
+        ax.set_xlim(0, height)
+        ax.set_ylim(width, 0)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.1)
         fig.colorbar(im, cax=cax)
@@ -433,12 +437,15 @@ class YMazeAnalysis(DLCDataset):
 
         arm_tags = ["A", "B", "C"]
         ref_pt = []
-        #temp_arms = ArmCollection()
+        # temp_arms = ArmCollection()
         for a in arm_tags:
             name = [f"Arm{a}_{c+1}" for c in range(4)]
             mask = data.loc[:, idx[name, "likelihood"]] > 0.98
-            xy = data.loc[mask.values, idx[name, ["x","y"]]].median()
-            arm_center = xy.loc[idx[name, ["x"]]].mean(), xy.loc[idx[name, ["y"]]].mean()
+            xy = data.loc[mask.values, idx[name, ["x", "y"]]].median()
+            arm_center = (
+                xy.loc[idx[name, ["x"]]].mean(),
+                xy.loc[idx[name, ["y"]]].mean(),
+            )
             ref_pt.append(arm_center)
 
         # fit the abstract arm by DeepLabCut coordinates
@@ -470,15 +477,15 @@ class YMazeAnalysis(DLCDataset):
         xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms["A"].center], axis=0)[0])
 
         scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
-        
+
         withers = data.loc[:, idx["Withers", ["x", "y"]]].droplevel(0, axis=1).copy()
 
         # Set the rolling time window as 5
         rolling_window = "5s"
         withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
-        
+
         scaler = YMazeScaler([arms["A"].center, arms["B"].center, arms["C"].center])
-        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        pt1, pt2 = scaler.scale([(1, 1), (0, 0)])
         self.scale_x = abs(pt1[0] - pt2[0])
         self.scale_y = abs(pt1[1] - pt2[1])
 
