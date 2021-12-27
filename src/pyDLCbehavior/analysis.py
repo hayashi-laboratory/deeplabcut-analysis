@@ -379,6 +379,7 @@ class YMazeAnalysis(DLCDataset):
     scale_y: float = field(init=False, default=1)
 
     # data after analysis
+    filtered_data: pd.DataFrame = field(init=False, repr=False, default=None)
     labeled_data: pd.DataFrame = field(init=False, repr=False, default=None)
     arms: ArmCollection = field(init=False, default_factory=ArmCollection)
     ymaze_center: np.ndarray = field(init=False, repr=False, default=None)
@@ -436,6 +437,7 @@ class YMazeAnalysis(DLCDataset):
             + np.square(np.diff(data.loc[:, idx[["Nose", "Withers"], "y"]]))
         )
         data = data[nose2wither < np.square(100)]
+        self.filtered_data = data.copy()
 
         arm_tags = ["A", "B", "C"]
         ref_pt = []
@@ -565,7 +567,7 @@ class YMazeAnalysis(DLCDataset):
         fig = plt.figure(figsize=(5, 5))
         ax = fig.add_subplot(111)
         data = self.labeled_data
-        withers = data["Withers"]
+        withers = self.filtered_data["Withers"]
         ax.plot(withers.x, withers.y, alpha=0.2)
 
         import re
