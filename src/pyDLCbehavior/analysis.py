@@ -299,6 +299,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         nose_np = self.climbing_filter.nose[["x", "y"]].values
         nose_np_y = nose_np[:, 1]
         nose_np_x = nose_np[:, 0]
+
         # make histrogram2d
         counts, y, x = np.histogram2d(
             nose_np_y,
@@ -328,6 +329,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         ax.set_ylim(width, 0)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.1)
+        ax.set_aspect(height/width)
         fig.colorbar(im, cax=cax)
 
         fig.tight_layout()
@@ -639,6 +641,7 @@ class YMazeAnalysis(DLCDataset):
                 spontaneous_alternation=[
                     self.alternation_data["spontaneous_alternation"]
                 ],
+                alternation_rate = self.alternation_data["alternation_ratio"],
                 total_distance=[self.total_distance],
                 mean_speed=[self.mean_speed],
             )
