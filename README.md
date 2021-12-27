@@ -21,7 +21,8 @@ py -3 -m venv .venv
 ```
 source ./.venv/Scripts/activate
 python -m pip install -U -r requirements.txt
-python -m pip install .
+python -m pip install .   
+python -m pip install ./deeplabcut-analysis/.
 ```
 
 - - for Linux/MacOs
