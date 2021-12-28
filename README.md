@@ -13,23 +13,22 @@ conda activate your_env_name
  > https://code.visualstudio.com/docs/python/python-tutorial
 ```
 conda activate your_env_name
-py -3 -m venv .venv
+python3 -m venv .venv
 ```
 
 - Activate the enviroment
 - - for windows
 ```
 source ./.venv/Scripts/activate
-python -m pip install -U -r requirements.txt
-python -m pip install .   
-python -m pip install ./deeplabcut-analysis/.
+git clone https://github.com/lycantrope/deeplabcut-analysis.git && cd deeplabcut-analysis
+python -m pip install .
 ```
 
 - - for Linux/MacOs
 ```
 source ./.venv/bin/activate
-python3.9 -m pip install -U -r requirements.txt
-python3.9 -m pip install .
+git clone https://github.com/lycantrope/deeplabcut-analysis.git && cd deeplabcut-analysis
+python -m pip install .   
 ```
 
 
