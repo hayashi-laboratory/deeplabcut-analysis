@@ -44,6 +44,7 @@ from .ymaze import ArmCollection, ArmRegion, BasicYMazeCollection, YMazeScaler
 
 __all__ = [&#34;NovelObjectRecognitionAnalysis&#34;, &#34;YMazeAnalysis&#34;]
 
+
 @dataclass
 class NovelObjectRecognitionAnalysis(DLCDataset):
 
@@ -326,6 +327,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
         nose_np_y = nose_np[:, 1]
         nose_np_x = nose_np[:, 0]
+
         # make histrogram2d
         counts, y, x = np.histogram2d(
             nose_np_y,
@@ -350,8 +352,12 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         im = ax.imshow(counts, cmap=cmap)
         # create an axes on the right side of ax. The width of cax will be 5%
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        width, height = counts.shape
+        ax.set_xlim(0, height)
+        ax.set_ylim(width, 0)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+        ax.set_aspect(height/width)
         fig.colorbar(im, cax=cax)
 
         fig.tight_layout()
@@ -401,6 +407,7 @@ class YMazeAnalysis(DLCDataset):
     scale_y: float = field(init=False, default=1)
 
     # data after analysis
+    filtered_data: pd.DataFrame = field(init=False, repr=False, default=None)
     labeled_data: pd.DataFrame = field(init=False, repr=False, default=None)
     arms: ArmCollection = field(init=False, default_factory=ArmCollection)
     ymaze_center: np.ndarray = field(init=False, repr=False, default=None)
@@ -458,15 +465,19 @@ class YMazeAnalysis(DLCDataset):
             + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
         )
         data = data[nose2wither &lt; np.square(100)]
+        self.filtered_data = data.copy()
 
         arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
         ref_pt = []
-        #temp_arms = ArmCollection()
+        # temp_arms = ArmCollection()
         for a in arm_tags:
             name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
             mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
-            xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
-            arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+            xy = data.loc[mask.values, idx[name, [&#34;x&#34;, &#34;y&#34;]]].median()
+            arm_center = (
+                xy.loc[idx[name, [&#34;x&#34;]]].mean(),
+                xy.loc[idx[name, [&#34;y&#34;]]].mean(),
+            )
             ref_pt.append(arm_center)
 
         # fit the abstract arm by DeepLabCut coordinates
@@ -498,15 +509,15 @@ class YMazeAnalysis(DLCDataset):
         xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
 
         scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
-        
+
         withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
 
         # Set the rolling time window as 5
         rolling_window = &#34;5s&#34;
         withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
-        
+
         scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
-        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        pt1, pt2 = scaler.scale([(1, 1), (0, 0)])
         self.scale_x = abs(pt1[0] - pt2[0])
         self.scale_y = abs(pt1[1] - pt2[1])
 
@@ -584,7 +595,7 @@ class YMazeAnalysis(DLCDataset):
         fig = plt.figure(figsize=(5, 5))
         ax = fig.add_subplot(111)
         data = self.labeled_data
-        withers = data[&#34;Withers&#34;]
+        withers = self.filtered_data[&#34;Withers&#34;]
         ax.plot(withers.x, withers.y, alpha=0.2)
 
         import re
@@ -660,6 +671,7 @@ class YMazeAnalysis(DLCDataset):
                 spontaneous_alternation=[
                     self.alternation_data[&#34;spontaneous_alternation&#34;]
                 ],
+                alternation_rate = self.alternation_data[&#34;alternation_ratio&#34;],
                 total_distance=[self.total_distance],
                 mean_speed=[self.mean_speed],
             )
@@ -978,6 +990,7 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
         nose_np_y = nose_np[:, 1]
         nose_np_x = nose_np[:, 0]
+
         # make histrogram2d
         counts, y, x = np.histogram2d(
             nose_np_y,
@@ -1002,8 +1015,12 @@ class NovelObjectRecognitionAnalysis(DLCDataset):
         im = ax.imshow(counts, cmap=cmap)
         # create an axes on the right side of ax. The width of cax will be 5%
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        width, height = counts.shape
+        ax.set_xlim(0, height)
+        ax.set_ylim(width, 0)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+        ax.set_aspect(height/width)
         fig.colorbar(im, cax=cax)
 
         fig.tight_layout()
@@ -1378,6 +1395,7 @@ def summary_df(self) -&gt; pd.DataFrame:
     nose_np = self.climbing_filter.nose[[&#34;x&#34;, &#34;y&#34;]].values
     nose_np_y = nose_np[:, 1]
     nose_np_x = nose_np[:, 0]
+
     # make histrogram2d
     counts, y, x = np.histogram2d(
         nose_np_y,
@@ -1402,8 +1420,12 @@ def summary_df(self) -&gt; pd.DataFrame:
     im = ax.imshow(counts, cmap=cmap)
     # create an axes on the right side of ax. The width of cax will be 5%
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    width, height = counts.shape
+    ax.set_xlim(0, height)
+    ax.set_ylim(width, 0)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes(&#34;right&#34;, size=&#34;5%&#34;, pad=0.1)
+    ax.set_aspect(height/width)
     fig.colorbar(im, cax=cax)
 
     fig.tight_layout()
@@ -1534,6 +1556,7 @@ class YMazeAnalysis(DLCDataset):
     scale_y: float = field(init=False, default=1)
 
     # data after analysis
+    filtered_data: pd.DataFrame = field(init=False, repr=False, default=None)
     labeled_data: pd.DataFrame = field(init=False, repr=False, default=None)
     arms: ArmCollection = field(init=False, default_factory=ArmCollection)
     ymaze_center: np.ndarray = field(init=False, repr=False, default=None)
@@ -1591,15 +1614,19 @@ class YMazeAnalysis(DLCDataset):
             + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
         )
         data = data[nose2wither &lt; np.square(100)]
+        self.filtered_data = data.copy()
 
         arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
         ref_pt = []
-        #temp_arms = ArmCollection()
+        # temp_arms = ArmCollection()
         for a in arm_tags:
             name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
             mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
-            xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
-            arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+            xy = data.loc[mask.values, idx[name, [&#34;x&#34;, &#34;y&#34;]]].median()
+            arm_center = (
+                xy.loc[idx[name, [&#34;x&#34;]]].mean(),
+                xy.loc[idx[name, [&#34;y&#34;]]].mean(),
+            )
             ref_pt.append(arm_center)
 
         # fit the abstract arm by DeepLabCut coordinates
@@ -1631,15 +1658,15 @@ class YMazeAnalysis(DLCDataset):
         xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
 
         scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
-        
+
         withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
 
         # Set the rolling time window as 5
         rolling_window = &#34;5s&#34;
         withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
-        
+
         scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
-        pt1, pt2 = scaler.scale([(1,1), (0,0)])
+        pt1, pt2 = scaler.scale([(1, 1), (0, 0)])
         self.scale_x = abs(pt1[0] - pt2[0])
         self.scale_y = abs(pt1[1] - pt2[1])
 
@@ -1717,7 +1744,7 @@ class YMazeAnalysis(DLCDataset):
         fig = plt.figure(figsize=(5, 5))
         ax = fig.add_subplot(111)
         data = self.labeled_data
-        withers = data[&#34;Withers&#34;]
+        withers = self.filtered_data[&#34;Withers&#34;]
         ax.plot(withers.x, withers.y, alpha=0.2)
 
         import re
@@ -1793,6 +1820,7 @@ class YMazeAnalysis(DLCDataset):
                 spontaneous_alternation=[
                     self.alternation_data[&#34;spontaneous_alternation&#34;]
                 ],
+                alternation_rate = self.alternation_data[&#34;alternation_ratio&#34;],
                 total_distance=[self.total_distance],
                 mean_speed=[self.mean_speed],
             )
@@ -1809,6 +1837,10 @@ class YMazeAnalysis(DLCDataset):
 <div class="desc"></div>
 </dd>
 <dt id="pyDLCbehavior.analysis.YMazeAnalysis.arms"><code class="name">var <span class="ident">arms</span> : <a title="pyDLCbehavior.ymaze.ArmCollection" href="ymaze.html#pyDLCbehavior.ymaze.ArmCollection">ArmCollection</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyDLCbehavior.analysis.YMazeAnalysis.filtered_data"><code class="name">var <span class="ident">filtered_data</span> : pandas.core.frame.DataFrame</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -1869,6 +1901,7 @@ def summary_df(self) -&gt; pd.DataFrame:
             spontaneous_alternation=[
                 self.alternation_data[&#34;spontaneous_alternation&#34;]
             ],
+            alternation_rate = self.alternation_data[&#34;alternation_ratio&#34;],
             total_distance=[self.total_distance],
             mean_speed=[self.mean_speed],
         )
@@ -1899,15 +1932,19 @@ def summary_df(self) -&gt; pd.DataFrame:
         + np.square(np.diff(data.loc[:, idx[[&#34;Nose&#34;, &#34;Withers&#34;], &#34;y&#34;]]))
     )
     data = data[nose2wither &lt; np.square(100)]
+    self.filtered_data = data.copy()
 
     arm_tags = [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;]
     ref_pt = []
-    #temp_arms = ArmCollection()
+    # temp_arms = ArmCollection()
     for a in arm_tags:
         name = [f&#34;Arm{a}_{c+1}&#34; for c in range(4)]
         mask = data.loc[:, idx[name, &#34;likelihood&#34;]] &gt; 0.98
-        xy = data.loc[mask.values, idx[name, [&#34;x&#34;,&#34;y&#34;]]].median()
-        arm_center = xy.loc[idx[name, [&#34;x&#34;]]].mean(), xy.loc[idx[name, [&#34;y&#34;]]].mean()
+        xy = data.loc[mask.values, idx[name, [&#34;x&#34;, &#34;y&#34;]]].median()
+        arm_center = (
+            xy.loc[idx[name, [&#34;x&#34;]]].mean(),
+            xy.loc[idx[name, [&#34;y&#34;]]].mean(),
+        )
         ref_pt.append(arm_center)
 
     # fit the abstract arm by DeepLabCut coordinates
@@ -1939,15 +1976,15 @@ def summary_df(self) -&gt; pd.DataFrame:
     xdiff, ydiff = np.absolute(np.diff([ymaze_center, arms[&#34;A&#34;].center], axis=0)[0])
 
     scale_x, scale_y = 40 * 0.5 * np.sqrt(3) / xdiff, 40 * 0.5 / ydiff
-    
+
     withers = data.loc[:, idx[&#34;Withers&#34;, [&#34;x&#34;, &#34;y&#34;]]].droplevel(0, axis=1).copy()
 
     # Set the rolling time window as 5
     rolling_window = &#34;5s&#34;
     withers = withers.rolling(rolling_window).mean().dropna()  # Moving average
-    
+
     scaler = YMazeScaler([arms[&#34;A&#34;].center, arms[&#34;B&#34;].center, arms[&#34;C&#34;].center])
-    pt1, pt2 = scaler.scale([(1,1), (0,0)])
+    pt1, pt2 = scaler.scale([(1, 1), (0, 0)])
     self.scale_x = abs(pt1[0] - pt2[0])
     self.scale_y = abs(pt1[1] - pt2[1])
 
@@ -2086,7 +2123,7 @@ def summary_df(self) -&gt; pd.DataFrame:
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111)
     data = self.labeled_data
-    withers = data[&#34;Withers&#34;]
+    withers = self.filtered_data[&#34;Withers&#34;]
     ax.plot(withers.x, withers.y, alpha=0.2)
 
     import re
@@ -2208,6 +2245,7 @@ def summary_df(self) -&gt; pd.DataFrame:
 <li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.analyze" href="#pyDLCbehavior.analysis.YMazeAnalysis.analyze">analyze</a></code></li>
 <li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.analyze_alternation" href="#pyDLCbehavior.analysis.YMazeAnalysis.analyze_alternation">analyze_alternation</a></code></li>
 <li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.arms" href="#pyDLCbehavior.analysis.YMazeAnalysis.arms">arms</a></code></li>
+<li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.filtered_data" href="#pyDLCbehavior.analysis.YMazeAnalysis.filtered_data">filtered_data</a></code></li>
 <li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.labeled_data" href="#pyDLCbehavior.analysis.YMazeAnalysis.labeled_data">labeled_data</a></code></li>
 <li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.locomotion_data" href="#pyDLCbehavior.analysis.YMazeAnalysis.locomotion_data">locomotion_data</a></code></li>
 <li><code><a title="pyDLCbehavior.analysis.YMazeAnalysis.mean_speed" href="#pyDLCbehavior.analysis.YMazeAnalysis.mean_speed">mean_speed</a></code></li>
