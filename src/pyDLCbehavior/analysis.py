@@ -636,6 +636,7 @@ class YMazeAnalysis(DLCDataset):
     def summary_df(self) -> pd.DataFrame:
         return pd.DataFrame.from_dict(
             OrderedDict(
+                videofilename = [self.csv_path.stem.split("_")[0],
                 filename=[self.csv_path.stem],
                 video_shape=[self.frame_dimensions],
                 video_fps=[self.FPS],
