@@ -19,7 +19,7 @@ python3 -m venv .venv
 - Activate the enviroment
 - - for windows
 ```
-source ./.venv/Scripts/activate
+(.venv) C:Users\yourname\....\directory_you_want>  ./.venv/Scripts/activate
 git clone https://github.com/lycantrope/deeplabcut-analysis.git && cd deeplabcut-analysis
 python -m pip install .
 ```
