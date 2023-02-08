@@ -48,11 +48,16 @@ python -m ipykernel install --user --name=your_env_name
 
 ---  
 
-# Y-maze analysis  
+# YMaze_analysis.ipynb
+Run this code in Jupyter.
 
-- requirements  
+- [x]  **dataset requirements.**
  1. csv files exported from DLC.
- 2. pickle files exported from DLC.
+ 2. pickle files exported from DLC.  
  
+ 
+ 
+- [x] **Set the directory path `HOMEDIR` which stores above datasets.**
+  
  
 
