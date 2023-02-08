@@ -56,7 +56,37 @@ python -m ipykernel install --user --name=your_env_name
 ```
 
 
+<br> 
+<br>
+
+`pyDLCbehavior` package provides `NovelObjectRecognitionAnalysis` and `YMazeAnalysis` class objects, which can analyze the NOR test and Y-maze test.  
+These class objects have the result dataframe obtained from every experimental file, so the results can be summarized in Jupyter lab or Jupyter notebook using the following ipynb files.
+
+<br>  
+
+ 
+
+<br>
+<br>
+
+# novel_object_analysis.ipynb
+Run this code in Jupyter.  
+
+
+- [x]  **dataset requirements.**
+ 1. csv files exported from DLC.
+ 2. pickle files exported from DLC.
+ 3. avi files you took in your experiment.  
+ 
+ 
+- [x] **Set the directory path `HOMEDIR` which stores above datasets.**
+  
+<br>
+<br>
+
 ---  
+<br>
+<br>
 
 # YMaze_analysis.ipynb
 Run this code in Jupyter.
@@ -69,5 +99,6 @@ Run this code in Jupyter.
  
 - [x] **Set the directory path `HOMEDIR` which stores above datasets.**
   
- 
+ <br>
+<br>
 
