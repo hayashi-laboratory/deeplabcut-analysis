@@ -79,7 +79,7 @@ Run this code in Jupyter.
  3. avi files you recorded in your experiment.  
  
  
-- [x] **Set the directory path `HOMEDIR` which stores above datasets.**  
+- [x] **Set the directory path `HOMEDIR` that stores above datasets.**  
 
 - [x] **Set the ROI to determine the coordinate of the center of each object**  
   e.g.)  
@@ -100,7 +100,7 @@ Run this code in Jupyter.
  
  
  
-- [x] **Set the directory path `HOMEDIR` which stores above datasets.**
+- [x] **Set the directory path `HOMEDIR` that stores above datasets.**
   
  <br>
 <br>
