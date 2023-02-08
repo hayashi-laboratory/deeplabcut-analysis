@@ -79,12 +79,15 @@ Run this code in Jupyter.
  3. avi files you took in your experiment.  
  
  
-- [x] **Set the directory path `HOMEDIR` which stores above datasets.**
+- [x] **Set the directory path `HOMEDIR` which stores above datasets.**  
+
+- [x] **Set the ROI to determine the coordinate of the center of each object**  
+  e.g.)
+  zone1: right upper object
+  zone2: left lower object
   
 <br>
-<br>
 
----  
 <br>
 <br>
 
