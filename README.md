@@ -21,7 +21,7 @@ python3 -m venv .venv
 
 **For windows user**  
 <br>
-Activate .venv
+Activate .venv in command prompt
 ```
 (.venv) C:Users\yourname\....\directory_you_want>  ./.venv/Scripts/activate
 ```
