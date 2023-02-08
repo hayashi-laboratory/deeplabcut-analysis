@@ -10,21 +10,31 @@ conda activate your_env_name
 
 - create a venv in the directory your want 
 - It will create a .venv folder in your enviornment
- > https://code.visualstudio.com/docs/python/python-tutorial
+ > https://code.visualstudio.com/docs/python/python-tutorial 
 ```
 conda activate your_env_name
 python3 -m venv .venv
 ```
 
-- Activate the enviroment
-- - for windows
+- Deactivate the conda environment  
+- Then activate the python venv enviroment  
+
+**For windows user**  
+<br>
+Activate .venv
 ```
 (.venv) C:Users\yourname\....\directory_you_want>  ./.venv/Scripts/activate
+```
+Clone this repository using git bash  
+```
 git clone https://github.com/lycantrope/deeplabcut-analysis.git && cd deeplabcut-analysis
+```
+Install all necessary packages 
+```
 python -m pip install .
 ```
 
-- - for Linux/MacOs
+**For Linux/MacOs user**
 ```
 source ./.venv/bin/activate
 git clone https://github.com/lycantrope/deeplabcut-analysis.git && cd deeplabcut-analysis
