@@ -76,7 +76,7 @@ Run this code in Jupyter.
 - [x]  **dataset requirements.**
  1. csv files exported from DLC.
  2. pickle files exported from DLC.
- 3. avi files you took in your experiment.  
+ 3. avi files you recorded in your experiment.  
  
  
 - [x] **Set the directory path `HOMEDIR` which stores above datasets.**  
