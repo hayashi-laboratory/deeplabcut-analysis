@@ -44,3 +44,15 @@ python -m ipykernel install --user --name=your_env_name
 ```
 /path/to/kernel/env/bin/python -m ipykernel install --prefix=/path/to/jupyter/env --name 'python-my-env'
 ```
+
+
+---  
+
+# Y-maze analysis  
+
+- requirements  
+ 1. csv files exported from DLC.
+ 2. pickle files exported from DLC.
+ 
+ 
+
