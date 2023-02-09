@@ -73,10 +73,11 @@ These class objects have the result dataframe obtained from every experimental f
 Run this code in Jupyter.  
 
 
-- [x]  **dataset requirements.**
+- [x]  **dataset requirements, preferably stored in the same directory**  
+   
  1. csv files exported from DLC.
  2. pickle files exported from DLC.
- 3. avi files you recorded in your experiment.  
+ 3. avi files recorded in your NOR experiment.  
  
  
 - [x] **Set the directory path `HOMEDIR` that stores above datasets.**  
@@ -94,7 +95,8 @@ Run this code in Jupyter.
 # YMaze_analysis.ipynb
 Run this code in Jupyter.
 
-- [x]  **dataset requirements.**
+- [x]  **dataset requirements, preferably stored in the same directory**  
+  
  1. csv files exported from DLC.
  2. pickle files exported from DLC.  
  
