@@ -644,7 +644,7 @@ class YMazeAnalysis(DLCDataset):
                 spontaneous_alternation=[
                     self.alternation_data["spontaneous_alternation"]
                 ],
-                alternation_rate = self.alternation_data["alternation_ratio"],
+                alternation_ratio = self.alternation_data["alternation_ratio"],
                 total_distance=[self.total_distance],
                 mean_speed=[self.mean_speed],
             )
